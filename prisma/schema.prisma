@@ -1,0 +1,558 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model category {
+  id                                                                 Int                       @id @default(autoincrement())
+  name                                                               String?                   @db.VarChar(45)
+  course_category_course_category_categoryTocategory                 course_category[]         @relation("course_category_categoryTocategory")
+  course_student_category_course_student_category_categoryTocategory course_student_category[] @relation("course_student_category_categoryTocategory")
+  driving_schedule_driving_schedule_categoryTocategory               driving_schedule[]        @relation("driving_schedule_categoryTocategory")
+  exam_exam_categoryTocategory                                       exam[]                    @relation("exam_categoryTocategory")
+  schedule_schedule_categoryTocategory                               schedule[]                @relation("schedule_categoryTocategory")
+  topic_topic_categoryTocategory                                     topic[]                   @relation("topic_categoryTocategory")
+}
+
+model course {
+  id                                                           Int                      @id @default(autoincrement())
+  name                                                         String?                  @db.VarChar(155)
+  kode                                                         String?                  @db.VarChar(55)
+  password                                                     String?                  @db.VarChar(255)
+  city                                                         Int?
+  district                                                     Int?
+  horoo                                                        Int?
+  location                                                     String?                  @db.VarChar(100)
+  location_map                                                 String?                  @db.VarChar(55)
+  phone                                                        String?                  @db.VarChar(12)
+  shortdesc                                                    String?                  @db.VarChar(155)
+  featured                                                     Int?
+  date                                                         DateTime?                @db.Timestamp(0)
+  branches_branches_courseTocourse                             branches[]               @relation("branches_courseTocourse")
+  course_cars_course_cars_courseTocourse                       course_cars[]            @relation("course_cars_courseTocourse")
+  course_category_course_category_courseTocourse               course_category[]        @relation("course_category_courseTocourse")
+  course_images_course_images_courseTocourse                   course_images[]          @relation("course_images_courseTocourse")
+  course_limit_invoice_course_limit_invoice_courseTocourse     course_limit_invoice[]   @relation("course_limit_invoice_courseTocourse")
+  course_list_course_list_courseTocourse                       course_list[]            @relation("course_list_courseTocourse")
+  course_student_course_student_courseTocourse                 course_student[]         @relation("course_student_courseTocourse")
+  course_system_rental_course_system_rental_courseTocourse     course_system_rental[]   @relation("course_system_rental_courseTocourse")
+  course_teachers_course_teachers_courseTocourse               course_teachers[]        @relation("course_teachers_courseTocourse")
+  course_user_device_log_course_user_device_log_courseTocourse course_user_device_log[] @relation("course_user_device_log_courseTocourse")
+  course_users_course_users_courseTocourse                     course_users[]           @relation("course_users_courseTocourse")
+  driving_schedule_driving_schedule_courseTocourse             driving_schedule[]       @relation("driving_schedule_courseTocourse")
+  exam_exam_courseTocourse                                     exam[]                   @relation("exam_courseTocourse")
+  messages_messages_courseTocourse                             messages[]               @relation("messages_courseTocourse")
+  schedule_schedule_courseTocourse                             schedule[]               @relation("schedule_courseTocourse")
+}
+
+model course_cars {
+  id                                Int                @id @default(autoincrement())
+  course                            Int?
+  vechile                           String?            @db.VarChar(35)
+  region_number                     String?            @db.VarChar(15)
+  image                             String?            @db.VarChar(255)
+  type                              Int?
+  date                              DateTime?          @db.Timestamp(0)
+  course_course_cars_courseTocourse course?            @relation("course_cars_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_cars_to_course")
+  driving_schedule                  driving_schedule[]
+
+  @@index([course], map: "course_cars_to_course_idx")
+}
+
+model course_category {
+  id                                          Int       @id @default(autoincrement())
+  course                                      Int?
+  category                                    Int?
+  registerPrice                               Decimal?  @db.Decimal(10, 2)
+  price                                       Decimal?  @db.Decimal(10, 2)
+  category_course_category_categoryTocategory category? @relation("course_category_categoryTocategory", fields: [category], references: [id], onDelete: Cascade, map: "course_category_to_category")
+  course_course_category_courseTocourse       course?   @relation("course_category_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_category_to_course")
+
+  @@index([category], map: "course_category_to_category_idx")
+  @@index([course], map: "course_category_to_course_idx")
+}
+
+model course_images {
+  id                                  Int     @id @default(autoincrement())
+  course                              Int?
+  image                               String? @db.VarChar(255)
+  course_course_images_courseTocourse course? @relation("course_images_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_images_to_course")
+
+  @@index([course], map: "course_images_to_course_idx")
+}
+
+model course_limit_invoice {
+  id                                         Int       @id @default(autoincrement())
+  course                                     Int?
+  invoice_id                                 Int?
+  limit                                      Int?
+  status                                     String?   @db.VarChar(15)
+  amount                                     Decimal?  @db.Decimal(10, 2)
+  description                                String?   @db.VarChar(45)
+  number                                     String?   @db.VarChar(45)
+  url                                        String?   @db.VarChar(255)
+  due_date                                   DateTime? @db.Timestamp(0)
+  created_at                                 DateTime? @db.Timestamp(0)
+  updated_at                                 DateTime? @db.Timestamp(0)
+  course_course_limit_invoice_courseTocourse course?   @relation("course_limit_invoice_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_limit_invoice_to_course")
+
+  @@index([course], map: "course_limit_invoice_to_course_idx")
+}
+
+model course_list {
+  id                                Int     @id @default(autoincrement())
+  course                            Int?
+  list                              String? @db.VarChar(155)
+  course_course_list_courseTocourse course? @relation("course_list_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_list_to_course")
+
+  @@index([course], map: "course_list_to_course_idx")
+}
+
+model course_rating {
+  id       Int       @id @default(autoincrement())
+  course   Int?
+  username String?   @db.VarChar(45)
+  title    String?   @db.VarChar(155)
+  content  String?   @db.VarChar(500)
+  rating   Float?    @db.Float
+  date     DateTime? @db.Timestamp(0)
+}
+
+model course_student {
+  id                                         Int                               @id @default(autoincrement())
+  course                                     Int?
+  branch                                     Int?
+  familyname                                 String?                           @db.VarChar(55)
+  firstname                                  String?                           @db.VarChar(45)
+  lastname                                   String?                           @db.VarChar(45)
+  register                                   String?                           @db.VarChar(15)
+  gender                                     Int?
+  bloodtype                                  Int?
+  city                                       Int?
+  district                                   Int?
+  ward                                       Int?
+  location                                   String?                           @db.VarChar(255)
+  phone                                      String?                           @db.VarChar(12)
+  kode                                       String?                           @db.VarChar(45)
+  password                                   String?                           @db.VarChar(255)
+  birthdate                                  DateTime?                         @db.Timestamp(0)
+  date                                       DateTime?                         @db.Timestamp(0)
+  blood_type                                 blood_type?                       @relation(fields: [bloodtype], references: [id], onDelete: Cascade, map: "course_student_to_bloodtype")
+  branches                                   branches?                         @relation(fields: [branch], references: [id], onDelete: Cascade, map: "course_student_to_branch")
+  city_course_student_cityTocity             city?                             @relation("course_student_cityTocity", fields: [city], references: [id], onDelete: Cascade, map: "course_student_to_city")
+  course_course_student_courseTocourse       course?                           @relation("course_student_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_student_to_course")
+  district_course_student_districtTodistrict district?                         @relation("course_student_districtTodistrict", fields: [district], references: [id], onDelete: Cascade, map: "course_student_to_district")
+  gender_course_student_genderTogender       gender?                           @relation("course_student_genderTogender", fields: [gender], references: [id], onDelete: Cascade, map: "course_student_to_gender")
+  wards                                      wards?                            @relation(fields: [ward], references: [id], onDelete: Cascade, map: "course_student_to_ward")
+  course_student_category                    course_student_category[]
+  course_student_driving_schedule            course_student_driving_schedule[]
+  course_student_schedule                    course_student_schedule[]
+  exam                                       exam[]
+  messages                                   messages[]
+  student_topic_progress                     student_topic_progress[]
+
+  @@index([course], map: "student_to_course_idx")
+  @@index([branch], map: "course_student_to_branch_idx")
+  @@index([bloodtype], map: "course_student_to_bloodtype_idx")
+  @@index([gender], map: "course_student_to_gender_idx")
+  @@index([city], map: "course_student_to_city_idx")
+  @@index([district], map: "course_student_to_district_idx")
+  @@index([ward], map: "course_student_to_ward_idx")
+}
+
+model course_student_category {
+  id                                                                                                                 Int                                @id @default(autoincrement())
+  student                                                                                                            Int?
+  category                                                                                                           Int?
+  payment                                                                                                            Decimal?                           @db.Decimal(10, 2)
+  date                                                                                                               DateTime?                          @db.Timestamp(0)
+  category_course_student_category_categoryTocategory                                                                category?                          @relation("course_student_category_categoryTocategory", fields: [category], references: [id], onDelete: Cascade, map: "course_student_category_category")
+  course_student                                                                                                     course_student?                    @relation(fields: [student], references: [id], onDelete: Cascade, map: "course_student_category_to_student")
+  course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category course_student_category_payments[] @relation("course_student_category_payments_course_student_categoryTocourse_student_category")
+
+  @@index([category])
+  @@index([student], map: "course_student_category_to_student_idx")
+}
+
+model course_student_category_payments {
+  id                                                                                                        Int                      @id @default(autoincrement())
+  course_student_category                                                                                   Int?
+  invoice_id                                                                                                Int?
+  status                                                                                                    String?                  @db.VarChar(15)
+  amount                                                                                                    Decimal?                 @db.Decimal(10, 2)
+  description                                                                                               String?                  @db.VarChar(45)
+  number                                                                                                    String?                  @db.VarChar(155)
+  url                                                                                                       String?                  @db.VarChar(255)
+  due_date                                                                                                  DateTime?                @db.Timestamp(0)
+  created_at                                                                                                DateTime?                @db.Timestamp(0)
+  updated_at                                                                                                String?                  @db.VarChar(45)
+  course_student_category_course_student_category_payments_course_student_categoryTocourse_student_category course_student_category? @relation("course_student_category_payments_course_student_categoryTocourse_student_category", fields: [course_student_category], references: [id], onDelete: Cascade, map: "course_student_category_payments_to_course_student_category")
+
+  @@index([course_student_category], map: "course_student_category_payments_to_course_student_category_idx")
+}
+
+model course_student_driving_schedule {
+  id                                                                                  Int               @id @default(autoincrement())
+  driving_schedule                                                                    Int?
+  student                                                                             Int?
+  attendance                                                                          Int?
+  note                                                                                String?           @db.VarChar(45)
+  date                                                                                DateTime?         @db.Timestamp(0)
+  update_date                                                                         DateTime?         @db.Timestamp(0)
+  driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule driving_schedule? @relation("course_student_driving_schedule_driving_scheduleTodriving_schedule", fields: [driving_schedule], references: [id], onDelete: Cascade, map: "course_student_driving_schedule_to_driving_schedule")
+  course_student                                                                      course_student?   @relation(fields: [student], references: [id], onDelete: Cascade, map: "course_student_driving_schedule_to_student")
+
+  @@index([driving_schedule], map: "course_student_driving_schedule_to_driving_schedule_idx")
+  @@index([student], map: "course_student_driving_schedule_to_student_idx")
+}
+
+model course_student_schedule {
+  id                                                  Int             @id @default(autoincrement())
+  student                                             Int?
+  schedule                                            Int?
+  attendance                                          Int?
+  note                                                String?         @db.VarChar(45)
+  date                                                DateTime?       @db.Timestamp(0)
+  updated_at                                          DateTime?       @db.Timestamp(0)
+  course_student                                      course_student? @relation(fields: [student], references: [id], onDelete: Cascade, map: "course_student_schedule_student")
+  schedule_course_student_schedule_scheduleToschedule schedule?       @relation("course_student_schedule_scheduleToschedule", fields: [schedule], references: [id], onDelete: Cascade, map: "course_student_schedule_to_schedule")
+
+  @@index([student])
+  @@index([schedule], map: "course_student_schedule_to_schedule_idx")
+}
+
+model course_system_rental {
+  id                                         Int       @id @default(autoincrement())
+  course                                     Int?
+  invoice_id                                 Int?
+  start_date                                 DateTime? @db.Timestamp(0)
+  end_date                                   DateTime? @db.Timestamp(0)
+  date                                       DateTime? @db.Timestamp(0)
+  status                                     String?   @db.VarChar(12)
+  amount                                     Decimal?  @db.Decimal(10, 2)
+  description                                String?   @db.VarChar(45)
+  number                                     String?   @db.VarChar(45)
+  url                                        String?   @db.VarChar(255)
+  due_date                                   DateTime? @db.Timestamp(0)
+  created_at                                 DateTime? @db.Timestamp(0)
+  updated_at                                 DateTime? @db.Timestamp(0)
+  course_course_system_rental_courseTocourse course?   @relation("course_system_rental_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_system_rental_to_course")
+
+  @@index([course], map: "course_system_rental_to_course_idx")
+}
+
+model course_teachers {
+  id                                    Int                @id @default(autoincrement())
+  course                                Int?
+  firstname                             String?            @db.VarChar(45)
+  lastname                              String?            @db.VarChar(45)
+  register                              String?            @db.VarChar(25)
+  kode                                  String?            @db.VarChar(45)
+  password                              String?            @db.VarChar(255)
+  date                                  DateTime?          @db.Timestamp(0)
+  course_course_teachers_courseTocourse course?            @relation("course_teachers_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_teachers_course")
+  driving_schedule                      driving_schedule[]
+  schedule                              schedule[]
+
+  @@index([course])
+}
+
+model course_users {
+  id                                 Int                      @id @default(autoincrement())
+  course                             Int?
+  firstname                          String?                  @db.VarChar(45)
+  lastname                           String?                  @db.VarChar(45)
+  register                           String?                  @db.VarChar(12)
+  phone                              String?                  @db.VarChar(12)
+  kode                               String?                  @db.VarChar(45)
+  password                           String?                  @db.VarChar(255)
+  birthdate                          DateTime?                @db.Timestamp(0)
+  date                               DateTime?                @db.Timestamp(0)
+  course_user_device                 course_user_device[]
+  course_user_device_log             course_user_device_log[]
+  course_course_users_courseTocourse course?                  @relation("course_users_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_users_to_course")
+
+  @@index([course], map: "course_users_to_course_idx")
+}
+
+model creators {
+  id          Int       @id @default(autoincrement())
+  fullname    String?   @db.VarChar(100)
+  nickname    String?   @db.VarChar(55)
+  birthdate   DateTime? @db.Timestamp(0)
+  gender      Int?
+  location    String?   @db.VarChar(155)
+  phone       String?   @db.VarChar(8)
+  email       String?   @db.VarChar(155)
+  discordName String?   @db.VarChar(100)
+  social      String?   @db.VarChar(500)
+  mainApp     Int?
+  device      Int?
+  experience  Int?
+  video       String?   @db.VarChar(255)
+  status      Int?
+  date        DateTime? @db.Timestamp(0)
+}
+
+model driving_schedule {
+  id                                                                                                 Int                               @id @default(autoincrement())
+  course                                                                                             Int?
+  category                                                                                           Int?
+  teacher                                                                                            Int?
+  car                                                                                                Int?
+  area                                                                                               String?                           @db.VarChar(55)
+  schedule_date                                                                                      DateTime?                         @db.Timestamp(0)
+  start_time                                                                                         DateTime?                         @db.Timestamp(0)
+  end_time                                                                                           DateTime?                         @db.Timestamp(0)
+  note                                                                                               String?                           @db.VarChar(45)
+  add_date                                                                                           DateTime?                         @db.Timestamp(0)
+  course_student_driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule course_student_driving_schedule[] @relation("course_student_driving_schedule_driving_scheduleTodriving_schedule")
+  course_cars                                                                                        course_cars?                      @relation(fields: [car], references: [id], onDelete: Cascade, map: "driving_schedule_to_car")
+  category_driving_schedule_categoryTocategory                                                       category?                         @relation("driving_schedule_categoryTocategory", fields: [category], references: [id], onDelete: Cascade, map: "driving_schedule_to_category")
+  course_driving_schedule_courseTocourse                                                             course?                           @relation("driving_schedule_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "driving_schedule_to_course")
+  course_teachers                                                                                    course_teachers?                  @relation(fields: [teacher], references: [id], onDelete: Cascade, map: "driving_schedule_to_teacher")
+
+  @@index([car], map: "driving_schedule_to_car_idx")
+  @@index([category], map: "driving_schedule_to_category_idx")
+  @@index([course], map: "driving_schedule_to_course_idx")
+  @@index([teacher], map: "driving_schedule_to_teacher_idx")
+}
+
+model exam {
+  id                               Int             @id @default(autoincrement())
+  course                           Int?
+  student                          Int?
+  category                         Int?
+  isMake                           Int?
+  progress                         Float?          @db.Float
+  success                          Int?
+  wrong                            Int?
+  end_date                         DateTime?       @db.Timestamp(0)
+  date                             DateTime?       @db.Timestamp(0)
+  category_exam_categoryTocategory category?       @relation("exam_categoryTocategory", fields: [category], references: [id], onDelete: Cascade, map: "exam_to_category")
+  course_exam_courseTocourse       course?         @relation("exam_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "exam_to_course")
+  course_student                   course_student? @relation(fields: [student], references: [id], onDelete: Cascade, map: "exam_to_student")
+  exam_test_exam_test_examToexam   exam_test[]     @relation("exam_test_examToexam")
+
+  @@index([category], map: "exam_to_category_idx")
+  @@index([course], map: "exam_to_course_idx")
+  @@index([student], map: "exam_to_student_idx")
+}
+
+model exam_test {
+  id                        Int   @id @default(autoincrement())
+  exam                      Int?
+  test                      Int?
+  answer                    Int?
+  isSuccess                 Int?
+  exam_exam_test_examToexam exam? @relation("exam_test_examToexam", fields: [exam], references: [id], onDelete: Cascade, map: "exam")
+  test_exam_test_testTotest test? @relation("exam_test_testTotest", fields: [test], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "test_exam")
+
+  @@index([exam], map: "exam_idx")
+  @@index([test], map: "test_idx")
+}
+
+model messages {
+  id                             Int             @id @default(autoincrement())
+  course                         Int?
+  student                        Int?
+  title                          String?         @db.VarChar(155)
+  message                        String?         @db.VarChar(500)
+  isRead                         Int?
+  date                           DateTime?       @db.Timestamp(0)
+  read_at                        DateTime?       @db.Timestamp(0)
+  course_messages_courseTocourse course?         @relation("messages_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "messages_to_course")
+  course_student                 course_student? @relation(fields: [student], references: [id], onDelete: Cascade, map: "messages_to_student")
+
+  @@index([course], map: "messages_to_course_idx")
+  @@index([student], map: "messages_to_student_idx")
+}
+
+model schedule {
+  id                                                                 Int                       @id @default(autoincrement())
+  course                                                             Int?
+  category                                                           Int?
+  teacher                                                            Int?
+  schedule_date                                                      DateTime?                 @db.Timestamp(0)
+  start_time                                                         DateTime?                 @db.Timestamp(0)
+  end_time                                                           DateTime?                 @db.Timestamp(0)
+  location                                                           String?                   @db.VarChar(55)
+  note                                                               String?                   @db.VarChar(155)
+  date                                                               DateTime?                 @db.Timestamp(0)
+  course_student_schedule_course_student_schedule_scheduleToschedule course_student_schedule[] @relation("course_student_schedule_scheduleToschedule")
+  category_schedule_categoryTocategory                               category?                 @relation("schedule_categoryTocategory", fields: [category], references: [id], onDelete: Cascade, map: "schedule_to_category")
+  course_schedule_courseTocourse                                     course?                   @relation("schedule_courseTocourse", fields: [course], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "schedule_to_course")
+  course_teachers                                                    course_teachers?          @relation(fields: [teacher], references: [id], onDelete: Cascade, map: "schedule_to_teacher")
+
+  @@index([category], map: "schedule_to_category_idx")
+  @@index([course], map: "schedule_to_course_idx")
+  @@index([teacher], map: "schedule_to_teacher_idx")
+}
+
+model student_topic_progress {
+  id                                        Int             @id @default(autoincrement())
+  topic                                     Int?
+  student                                   Int?
+  progress                                  Float?          @db.Float
+  completed                                 Int?
+  date                                      DateTime?       @db.Timestamp(0)
+  course_student                            course_student? @relation(fields: [student], references: [id], onDelete: Cascade, map: "student_topic_progress_student")
+  topic_student_topic_progress_topicTotopic topic?          @relation("student_topic_progress_topicTotopic", fields: [topic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "student_topic_progress_topic")
+
+  @@index([student])
+  @@index([topic])
+}
+
+model test {
+  id                                   Int            @id @default(autoincrement())
+  name                                 String?        @db.VarChar(255)
+  img                                  String?        @db.VarChar(255)
+  topic                                Int?
+  date                                 DateTime?      @db.Timestamp(0)
+  exam_test_exam_test_testTotest       exam_test[]    @relation("exam_test_testTotest")
+  topic_test_topicTotopic              topic?         @relation("test_topicTotopic", fields: [topic], references: [id], onDelete: Cascade, map: "test_to_topic")
+  test_answers_test_answers_testTotest test_answers[] @relation("test_answers_testTotest")
+
+  @@index([topic], map: "test_to_topic_idx")
+}
+
+model test_answers {
+  id                           Int     @id @default(autoincrement())
+  test                         Int?
+  title                        String? @db.VarChar(255)
+  isSuccess                    Int?
+  test_test_answers_testTotest test?   @relation("test_answers_testTotest", fields: [test], references: [id], onDelete: Cascade, map: "test_answers_to_test")
+
+  @@index([test], map: "test_idx")
+}
+
+model topic {
+  id                                                         Int                      @id @default(autoincrement())
+  name                                                       String?                  @db.VarChar(255)
+  category                                                   Int?
+  date                                                       DateTime?                @db.Timestamp(0)
+  student_topic_progress_student_topic_progress_topicTotopic student_topic_progress[] @relation("student_topic_progress_topicTotopic")
+  test_test_topicTotopic                                     test[]                   @relation("test_topicTotopic")
+  category_topic_categoryTocategory                          category?                @relation("topic_categoryTocategory", fields: [category], references: [id], onDelete: Cascade, map: "topic_to_category")
+
+  @@index([category], map: "category_idx")
+}
+
+model course_user_device {
+  id                     Int                      @id @default(autoincrement())
+  user                   Int?
+  device                 String?                  @db.VarChar(25)
+  timezone               String?                  @db.VarChar(30)
+  device_type            String?                  @db.VarChar(55)
+  browser                String?                  @db.VarChar(55)
+  first_login            DateTime?                @db.Timestamp(0)
+  last_login             DateTime?                @db.Timestamp(0)
+  isTrusted              Int?
+  isBlocked              Int?
+  isActive               Int?                     @db.TinyInt
+  date                   DateTime?                @db.Timestamp(0)
+  course_users           course_users?            @relation(fields: [user], references: [id], onDelete: Cascade, map: "course_user_device")
+  course_user_device_log course_user_device_log[]
+
+  @@index([user], map: "course_user_device_idx")
+}
+
+model course_user_device_log {
+  id                                           Int                 @id @default(autoincrement())
+  course                                       Int?
+  user                                         Int?
+  device                                       Int?
+  action                                       String?             @db.VarChar(45)
+  targetType                                   String?             @db.VarChar(25)
+  targetId                                     String?             @db.VarChar(30)
+  label                                        String?             @db.VarChar(155)
+  ip                                           String?             @db.VarChar(45)
+  date                                         DateTime?           @db.Timestamp(0)
+  course_course_user_device_log_courseTocourse course?             @relation("course_user_device_log_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "course_user_device_log_course")
+  course_user_device                           course_user_device? @relation(fields: [device], references: [id], onDelete: Cascade, map: "course_user_device_log_device")
+  course_users                                 course_users?       @relation(fields: [user], references: [id], onDelete: Cascade, map: "course_user_device_log_user")
+
+  @@index([course])
+  @@index([device])
+  @@index([user])
+}
+
+model branches {
+  id                                   Int              @id @default(autoincrement())
+  course                               Int?
+  name                                 String?          @db.VarChar(110)
+  code                                 String?          @db.VarChar(3)
+  phone                                String?          @db.VarChar(10)
+  email                                String?          @db.VarChar(155)
+  city                                 Int?
+  district                             Int?
+  ward                                 Int?
+  location                             String?          @db.VarChar(155)
+  map                                  String?          @db.VarChar(50)
+  active                               Int?
+  created_at                           DateTime?        @db.Timestamp(0)
+  city_branches_cityTocity             city?            @relation("branches_cityTocity", fields: [city], references: [id], onDelete: Cascade, map: "branches_to_city")
+  course_branches_courseTocourse       course?          @relation("branches_courseTocourse", fields: [course], references: [id], onDelete: Cascade, map: "branches_to_course")
+  district_branches_districtTodistrict district?        @relation("branches_districtTodistrict", fields: [district], references: [id], onDelete: Cascade, map: "branches_to_district")
+  wards                                wards?           @relation(fields: [ward], references: [id], onDelete: Cascade, map: "branches_to_ward")
+  course_student                       course_student[]
+
+  @@index([course], map: "branches_to_course_idx")
+  @@index([city], map: "branches_to_city_idx")
+  @@index([district], map: "branches_to_district_idx")
+  @@index([ward], map: "branches_to_ward_idx")
+}
+
+model blood_type {
+  id             Int              @id @default(autoincrement())
+  type           String?          @db.VarChar(55)
+  course_student course_student[]
+}
+
+model city {
+  id                                       Int              @id @default(autoincrement())
+  name                                     String?          @db.VarChar(55)
+  branches_branches_cityTocity             branches[]       @relation("branches_cityTocity")
+  course_student_course_student_cityTocity course_student[] @relation("course_student_cityTocity")
+  district_district_cityTocity             district[]       @relation("district_cityTocity")
+}
+
+model gender {
+  id                                           Int              @id @default(autoincrement())
+  gender                                       String?          @db.VarChar(55)
+  course_student_course_student_genderTogender course_student[] @relation("course_student_genderTogender")
+}
+
+model district {
+  id                                               Int              @id @default(autoincrement())
+  name                                             String?          @db.VarChar(55)
+  city                                             Int?
+  branches_branches_districtTodistrict             branches[]       @relation("branches_districtTodistrict")
+  course_student_course_student_districtTodistrict course_student[] @relation("course_student_districtTodistrict")
+  city_district_cityTocity                         city?            @relation("district_cityTocity", fields: [city], references: [id], onDelete: Cascade, map: "district_to_city")
+  wards_wards_districtTodistrict                   wards[]          @relation("wards_districtTodistrict")
+
+  @@index([city], map: "district_to_city_idx")
+}
+
+model wards {
+  id                                Int              @id @default(autoincrement())
+  district                          Int?
+  name                              String?          @db.VarChar(100)
+  branches                          branches[]
+  course_student                    course_student[]
+  district_wards_districtTodistrict district?        @relation("wards_districtTodistrict", fields: [district], references: [id], onDelete: Cascade, map: "wards_to_districts")
+
+  @@index([district], map: "wards_to_districts_idx")
+}
+
+model course_student_access {
+  id         Int       @id @default(autoincrement())
+  student    Int?
+  start_date DateTime? @db.Timestamp(0)
+  end_date   DateTime? @db.Timestamp(0)
+}
