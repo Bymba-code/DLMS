@@ -15,6 +15,7 @@ const ME_STUDENT = require("../../controllers/8. CourseStudent/12. ME")
 const authMiddlewareStudent = require("../../middlewares/studentCookieAuth")
 const STUDENT_GET_STAT = require("../../controllers/8. CourseStudent/13. STAT")
 const COURSE_STUDENT_REPORT = require("../../controllers/8. CourseStudent/14. SystemReport")
+const LOGOUT_STUDENT = require("../../controllers/8. CourseStudent/15. LOGOUT")
 
 const router = express.Router()
 
@@ -47,5 +48,8 @@ router.route("/stat/student")
 
 router.route("/autoschool/report-student")
 .get(authMiddlewareUser, COURSE_STUDENT_REPORT)
+
+router.route("/logout/student")
+.post(authMiddlewareStudent, LOGOUT_STUDENT)
 
 module.exports = router
