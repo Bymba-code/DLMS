@@ -27,7 +27,8 @@ const COURSE_GET_SINGLE_EXAM = async (req, res) => {
                             }
                         }
                     }
-                }
+                },
+                course_student:true
             };
 
         return await storeSingleData(res, 'exam', {

@@ -21,7 +21,9 @@ const UPDATE_STUDENT_SCHEDULE = async (req , res) => {
             model:`course_student_schedule`,
             whereClause: { id: parseInt(id)},
             data: {
-                ...(attendance && { attendance:parseInt(attendance) }),
+                ...(attendance !== undefined && attendance !== null && { 
+                        attendance: parseInt(attendance) || 0 
+                    }),
                 ...(note && { note}),
                 ...( { updated_at: new Date()})
             }

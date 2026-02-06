@@ -33,6 +33,8 @@ const genderRoute = require("./routes/27. Gender")
 const cityRoute = require("./routes/28. City")
 const districtRoute = require("./routes/29. District")
 const wardRoute = require("./routes/30. Wards")
+const studentDetailRoute = require("./routes/31. CourseStudentDetails")
+const onlineRegisterRoute = require("./routes/32. OnlineRegister")
 
 const app = express()
 
@@ -74,6 +76,8 @@ app.use(process.env.API_VERSION, genderRoute)
 app.use(process.env.API_VERSION, cityRoute)
 app.use(process.env.API_VERSION, districtRoute)
 app.use(process.env.API_VERSION, wardRoute)
+app.use(process.env.API_VERSION, studentDetailRoute)
+app.use(process.env.API_VERSION, onlineRegisterRoute)
 
 app.use('/uploads', express.static('uploads'));
 

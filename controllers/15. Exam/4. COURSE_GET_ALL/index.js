@@ -17,6 +17,7 @@ const COURSE_GET_ALL_EXAM = async (req, res) => {
         const where = {};
 
         where.course = parseInt(user?.course)
+        where.isMake = 1
 
 
         const orderByObj = {

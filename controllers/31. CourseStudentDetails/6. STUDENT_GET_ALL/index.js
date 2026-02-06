@@ -1,10 +1,10 @@
 const { storeData } = require("../../../services/controllerService");
 const prismaService = require("../../../services/prismaService");
 
-const COURSE_GET_ALL_SCHEDULE = async (req, res) => {
+const STUDENT_GET_ALL_DETAILS = async (req, res) => {
     try 
     {
-        const user = req.user;
+        const student = req.user;
 
         const {
             page,
@@ -12,32 +12,26 @@ const COURSE_GET_ALL_SCHEDULE = async (req, res) => {
             search,
             orderBy,
             order,
-            teacher,
-            category
         } = req.query;
 
-        const where = { };
+        const where = {
 
-        if(teacher) where.teacher = parseInt(teacher)
-        if(category) where.category = parseInt(category)
-        
-        where.course = parseInt(user?.course)
+        };
+
+        where.student = parseInt(student?.id)
 
         const orderByObj = {
             [orderBy]: order
         };
 
         const searchOptions = search ? {
-            fields: ['list'], 
+            fields: ['kode'], 
             value: search
         } : null;
 
-        const include = {
-            category_schedule_categoryTocategory:true,
-            course_teachers:true
-        };
+        const include = {};
 
-        return await storeData(res, 'schedule', {
+        return await storeData(res, 'course_student_details', {
             where,
             orderBy: orderByObj,
             page: page ? parseInt(page) : null,
@@ -57,4 +51,4 @@ const COURSE_GET_ALL_SCHEDULE = async (req, res) => {
     }
 };
 
-module.exports = COURSE_GET_ALL_SCHEDULE ;
+module.exports = STUDENT_GET_ALL_DETAILS ;

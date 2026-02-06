@@ -32,7 +32,7 @@ const COURSE_UPDATE_STUDENT = async (req, res) => {
       })
     }
 
-    const { branch, familyname, firstname, lastname, register, gender, bloodtype, city, district, ward, location, phone, birthdate, category } = req.body;
+    const { branch, familyname, firstname, lastname, register, gender, bloodtype, city, district, ward, location, phone, birthdate, category, password, confirmPassword} = req.body;
 
     let hashedPassword = "";
     if (password) {
@@ -70,7 +70,6 @@ const COURSE_UPDATE_STUDENT = async (req, res) => {
         ...(ward && {ward: parseInt(ward)}),
         ...(location && { location }),
         ...(phone && { phone }),
-        ...(kode && { kode }),
         ...(birthdate && { birthdate: new Date(birthdate) }),
         ...(password && { password: hashedPassword })
       }

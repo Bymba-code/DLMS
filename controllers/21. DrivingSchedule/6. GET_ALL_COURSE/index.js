@@ -35,7 +35,9 @@ const COURSE_GET_ALL_DRIVING_SCHEDULE = async (req, res) => {
 
         const include = {category_driving_schedule_categoryTocategory:true,
                 course_cars:true,
-                course_student_driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule:true};
+                course_student_driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule:true,
+                course_teachers:true
+            };
 
         return await storeData(res, 'driving_schedule', {
             where,

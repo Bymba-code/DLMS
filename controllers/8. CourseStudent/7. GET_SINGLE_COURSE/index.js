@@ -6,14 +6,12 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
     {
         const { id } = req.params;
 
-        // Суралцагчийн үндсэн мэдээлэл
         const student = await prismaService.course_student.findUnique({
             where: {
                 id: parseInt(id)
             }
         });
 
-        // Суралцагчийн ангилал болон төлбөрийн мэдээлэл
         const studentData = await prismaService.course_student_category.findFirst({
             where: {
                 student: parseInt(id)
@@ -24,7 +22,6 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
             }
         });
 
-        // Төлбөрийн статистик тооцоолох
         let paymentStats = {
             totalAmount: 0,
             paidAmount: 0,
@@ -71,7 +68,6 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
             };
         }
 
-        // Оюутны шалгалтуудыг авах
         const exams = await prismaService.exam.findMany({
             where: {
                 student: parseInt(id)

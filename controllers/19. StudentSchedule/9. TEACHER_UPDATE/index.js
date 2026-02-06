@@ -22,8 +22,8 @@ const TEACHER_UPDATE_STUDENT_SCHEDULE = async (req , res) => {
             whereClause: { id: parseInt(id)},
             data: {
                 ...(attendance !== undefined && attendance !== null && { 
-    attendance: parseInt(attendance) || 0 
-}),
+                        attendance: parseInt(attendance) || 0 
+                    }),
                 ...(note && { note}),
                 ...( { updated_at: new Date()})
             }

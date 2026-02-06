@@ -12,6 +12,13 @@ const ME_STUDENT = async (req, res) => {
             }
         })
 
+        const studentDetail = await prismaService.course_student_details.findFirst({
+            where:{
+                student:parseInt(student?.id)
+            }
+        })
+        
+
         if(!data)
         {
             return res.status(404).json({
@@ -31,7 +38,9 @@ const ME_STUDENT = async (req, res) => {
         return res.status(200).json({
             success:true,
             data:{data,
-            messageCount},
+            messageCount,
+            detail: studentDetail ? true : false
+        },
             message:"Амжилттай."
         })
 
