@@ -6,7 +6,7 @@ const { default: axios } = require("axios");
 const POST_COURSE_CATEGORY = async (req , res) => {
     try 
     {
-        const { course, category, registerPrice, price } = req.body;
+        const { course, category, registerPrice, price, active} = req.body;
 
         if(!course)
         {
@@ -37,7 +37,7 @@ const POST_COURSE_CATEGORY = async (req , res) => {
             return res.status(400).json({
                 succes:false,
                 data:[],
-                message: "Нийт үнэ оруулна уу."
+                message: "Нийт төлбөр оруулна уу."
             })
         }
 
@@ -77,7 +77,9 @@ const POST_COURSE_CATEGORY = async (req , res) => {
                 course:parseInt(course),
                 category:parseInt(category),
                 registerPrice: parseInt(registerPrice),
-                price: parseInt(price)
+                price: parseInt(price),
+                active: active ? 1 : 0,
+                created_at:new Date()
             }
         })
 

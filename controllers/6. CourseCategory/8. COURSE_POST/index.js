@@ -6,7 +6,7 @@ const COURSE_POST_CATEGORY = async (req , res) => {
     try 
     {
         const course = req.user 
-        const { category, registerPrice, price  } = req.body;
+        const { category, registerPrice, price, active  } = req.body;
 
         if(!category)
         {
@@ -64,7 +64,7 @@ const COURSE_POST_CATEGORY = async (req , res) => {
             })
         }
         
-        await insertData(res, { model: 'course_category', data: { course: parseInt(course?.id), category:parseInt(category), registerPrice:parseInt(registerPrice), price:parseInt(price)}})
+        await insertData(res, { model: 'course_category', data: { course: parseInt(course?.id), category:parseInt(category), registerPrice:parseInt(registerPrice), price:parseInt(price), active: active ? 1 : 0, created_at: new Date()}})
     }
     catch(err)
     {

@@ -32,7 +32,7 @@ const COURSE_UPDATE_CATEGORY = async (req , res) => {
             })
         }
 
-        const {registerPrice, price} = req.body;
+        const {registerPrice, price, active} = req.body;
 
         await updateData(res, {
             model:`course_category`,
@@ -40,6 +40,7 @@ const COURSE_UPDATE_CATEGORY = async (req , res) => {
             data: {
                 ...(registerPrice && { registerPrice: parseInt(registerPrice) }),
                 ...(price && { price: parseInt(price) }),
+                ...(active !== undefined && { active: parseInt(active   ) }),
 
             }
         })
