@@ -9,6 +9,10 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
         const student = await prismaService.course_student.findUnique({
             where: {
                 id: parseInt(id)
+            },
+            include:{
+                course_student_access:true,
+                course_student_details:true
             }
         });
 
@@ -18,7 +22,7 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
             },
             include: {
                 category_course_student_category_categoryTocategory: true,
-                course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category: true
+                course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category: true,
             }
         });
 
@@ -117,7 +121,9 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
             }
         });
         
-        // Оюутны бүх танхимийн хуваарийг авах
+        const now = new Date();
+
+        // Оюутны бүх танхимийн хуваарийг дэлгэрэнгүй мэдээллийн хамт авах
         const schedules = await prismaService.course_student_schedule.findMany({
             where: {
                 student: parseInt(id)
@@ -129,11 +135,37 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
                 attendance: true,
                 note: true,
                 date: true,
-                updated_at: true
+                updated_at: true,
+                schedule_course_student_schedule_scheduleToschedule: {
+                    select: {
+                        id: true,
+                        course: true,
+                        category: true,
+                        schedule_date: true,
+                        start_time: true,
+                        end_time: true,
+                        location: true,
+                        note: true,
+                        date: true,
+                        course_teachers: {
+                            select: {
+                                id: true,
+                                firstname: true,
+                                lastname: true
+                            }
+                        },
+                        category_schedule_categoryTocategory: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        }
+                    }
+                }
             }
         });
 
-        // Оюутны жолоодлогын хуваарийг авах
+        // Оюутны жолоодлогын хуваарийг дэлгэрэнгүй мэдээллийн хамт авах
         const drivingSchedules = await prismaService.course_student_driving_schedule.findMany({
             where: {
                 student: parseInt(id)
@@ -145,13 +177,81 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
                 attendance: true,
                 note: true,
                 date: true,
-                update_date: true
+                update_date: true,
+                driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule: {
+                    select: {
+                        id: true,
+                        course: true,
+                        category: true,
+                        area: true,
+                        schedule_date: true,
+                        start_time: true,
+                        end_time: true,
+                        note: true,
+                        add_date: true,
+                        course_teachers: {
+                            select: {
+                                id: true,
+                                firstname: true,
+                                lastname: true
+                            }
+                        },
+                        course_cars: {
+                            select: {
+                                id: true,
+                                vechile: true,
+                                region_number: true,
+                                type: true
+                            }
+                        },
+                        category_driving_schedule_categoryTocategory: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        }
+                    }
+                }
             }
         });
+
+        // Schedule мэдээллийг map хийх helper функц
+        const mapScheduleItem = (s) => ({
+            id: s.id,
+            attendance: s.attendance,
+            note: s.note,
+            date: s.date,
+            updated_at: s.updated_at,
+            scheduleInfo: s.schedule_course_student_schedule_scheduleToschedule
+        });
+
+        // Driving schedule мэдээллийг map хийх helper функц
+        const mapDrivingScheduleItem = (s) => ({
+            id: s.id,
+            attendance: s.attendance,
+            note: s.note,
+            date: s.date,
+            update_date: s.update_date,
+            drivingScheduleInfo: s.driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule
+        });
+
+
+
+        // Эхлээгүй (upcoming) schedule шүүх helper — schedule_date нь одоогийн цагаас хойш байвал эхлээгүй
+        const isScheduleNotStarted = (s) => {
+            const sd = s.schedule_course_student_schedule_scheduleToschedule?.schedule_date;
+            return sd && new Date(sd) > now;
+        };
+
+        const isDrivingNotStarted = (s) => {
+            const sd = s.driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule?.schedule_date;
+            return sd && new Date(sd) > now;
+        };
 
         // Танхимийн хуваарийн статистик тооцоолох
         const scheduleStats = {
             total: schedules.length,
+            notStarted: schedules.filter(isScheduleNotStarted).length,
             notMarked: schedules.filter(s => s.attendance === 0).length,
             attended: schedules.filter(s => s.attendance === 1).length,
             notAttended: schedules.filter(s => s.attendance === 2).length
@@ -169,6 +269,7 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
         // Жолоодлогын хуваарийн статистик тооцоолох
         const drivingStats = {
             total: drivingSchedules.length,
+            notStarted: drivingSchedules.filter(isDrivingNotStarted).length,
             notMarked: drivingSchedules.filter(s => s.attendance === 0).length,
             attended: drivingSchedules.filter(s => s.attendance === 1).length,
             notAttended: drivingSchedules.filter(s => s.attendance === 2).length
@@ -305,7 +406,7 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
             : 0;
 
         // Сүүлийн 3 шалгалт
-        const lastThreeExams = exams.slice(0, 3).map(exam => ({
+        const allExams = exams.map(exam => ({
             id: exam.id,
             category: exam.category,
             isMake: exam.isMake,
@@ -340,31 +441,39 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
                 // Танхимийн хуваарийн статистик
                 scheduleStats: {
                     total: scheduleStats.total,
+                    notStarted: scheduleStats.notStarted,
                     notMarked: scheduleStats.notMarked,
                     attended: scheduleStats.attended,
                     notAttended: scheduleStats.notAttended,
                     attendanceRate: scheduleStats.attendanceRate,
                     scheduleProgress: scheduleStats.scheduleProgress
                 },
+                // Танхимийн хуваарийн дэлгэрэнгүй мэдээлэл
                 scheduleDetails: {
-                    notMarkedList: schedules.filter(s => s.attendance === 0).map(s => s.id),
-                    attendedList: schedules.filter(s => s.attendance === 1).map(s => s.id),
-                    notAttendedList: schedules.filter(s => s.attendance === 2).map(s => s.id)
+                    allList: schedules.map(mapScheduleItem),
+                    notStartedList: schedules.filter(isScheduleNotStarted).map(mapScheduleItem),
+                    notMarkedList: schedules.filter(s => s.attendance === 0).map(mapScheduleItem),
+                    attendedList: schedules.filter(s => s.attendance === 1).map(mapScheduleItem),
+                    notAttendedList: schedules.filter(s => s.attendance === 2).map(mapScheduleItem)
                 },
                 
                 // Жолоодлогын хуваарийн статистик
                 drivingStats: {
                     total: drivingStats.total,
+                    notStarted: drivingStats.notStarted,
                     notMarked: drivingStats.notMarked,
                     attended: drivingStats.attended,
                     notAttended: drivingStats.notAttended,
                     attendanceRate: drivingStats.attendanceRate,
                     scheduleProgress: drivingStats.scheduleProgress
                 },
+                // Жолоодлогын хуваарийн дэлгэрэнгүй мэдээлэл
                 drivingDetails: {
-                    notMarkedList: drivingSchedules.filter(s => s.attendance === 0).map(s => s.id),
-                    attendedList: drivingSchedules.filter(s => s.attendance === 1).map(s => s.id),
-                    notAttendedList: drivingSchedules.filter(s => s.attendance === 2).map(s => s.id)
+                    allList: drivingSchedules.map(mapDrivingScheduleItem),
+                    notStartedList: drivingSchedules.filter(isDrivingNotStarted).map(mapDrivingScheduleItem),
+                    notMarkedList: drivingSchedules.filter(s => s.attendance === 0).map(mapDrivingScheduleItem),
+                    attendedList: drivingSchedules.filter(s => s.attendance === 1).map(mapDrivingScheduleItem),
+                    notAttendedList: drivingSchedules.filter(s => s.attendance === 2).map(mapDrivingScheduleItem)
                 },
                 
                 // Сэдвийн явцын статистик
@@ -389,7 +498,7 @@ const COURSE_STUDENT_GET_STAT = async (req, res) => {
                     averageSuccess: examStats.averageSuccess,
                     averageWrong: examStats.averageWrong
                 },
-                lastThreeExams: lastThreeExams
+                allExams: allExams
             },
             message: 'Статистик амжилттай татагдлаа.'
         });

@@ -1,7 +1,7 @@
 const { storeSingleData } = require("../../../services/controllerService");
 const prismaService = require("../../../services/prismaService");
 
-const GET_SINGLE_USER_DEVICE = async (req, res) => {
+const GET_SINGLE_ONLINE_REGISTER = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -17,7 +17,7 @@ const GET_SINGLE_USER_DEVICE = async (req, res) => {
        
         const include = {};
 
-        return await storeSingleData(res, 'course_user_device', {
+        return await storeSingleData(res, 'course_online_register', {
             where,
             include
         });
@@ -32,4 +32,4 @@ const GET_SINGLE_USER_DEVICE = async (req, res) => {
     }
 };
 
-module.exports = GET_SINGLE_USER_DEVICE;
+module.exports = GET_SINGLE_ONLINE_REGISTER;

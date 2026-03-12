@@ -1,6 +1,6 @@
 const { deleteData } = require("../../../services/controllerService")
 
-const DELETE_BRANCHES = async (req , res) => {
+const DELETE_COURSE = async (req , res) => {
     try 
     {
         const { id } = req.params;
@@ -13,7 +13,8 @@ const DELETE_BRANCHES = async (req , res) => {
             });
         }
 
-        await deleteData(`branches`, { id: parseInt(id)}, res)
+        await deleteData(`course`, { id: parseInt(id)}, res)
+
 
     }
     catch(err)
@@ -26,4 +27,4 @@ const DELETE_BRANCHES = async (req , res) => {
     }
 }
 
-module.exports = DELETE_BRANCHES
+module.exports = DELETE_COURSE

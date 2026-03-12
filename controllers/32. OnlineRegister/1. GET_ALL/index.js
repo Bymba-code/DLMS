@@ -1,6 +1,7 @@
 const { storeData } = require("../../../services/controllerService");
+const prismaService = require("../../../services/prismaService");
 
-const GET_ALL_WARDS = async (req, res) => {
+const GET_ALL_ONLINE_REGISTER = async (req, res) => {
     try 
     {
         const {
@@ -8,7 +9,7 @@ const GET_ALL_WARDS = async (req, res) => {
             limit,
             search,
             orderBy,
-            order,
+            order
         } = req.query;
 
         const where = {};
@@ -18,13 +19,13 @@ const GET_ALL_WARDS = async (req, res) => {
         };
 
         const searchOptions = search ? {
-            fields: ['kode'], 
+            fields: ['name'], 
             value: search
         } : null;
 
         const include = {};
 
-        return await storeData(res, 'wards', {
+        return await storeData(res, 'course_online_register', {
             where,
             orderBy: orderByObj,
             page: page ? parseInt(page) : null,
@@ -44,4 +45,4 @@ const GET_ALL_WARDS = async (req, res) => {
     }
 };
 
-module.exports = GET_ALL_WARDS
+module.exports = GET_ALL_ONLINE_REGISTER ;
