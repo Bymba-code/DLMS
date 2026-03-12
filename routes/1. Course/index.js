@@ -30,5 +30,4 @@ router.route("/me/course")
 router.route("/stat/course")
 .get(authMiddlewareUser, STAT_COURSE)
 
-
 module.exports = router

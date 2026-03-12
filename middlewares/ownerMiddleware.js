@@ -1,20 +1,20 @@
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const authMiddlewareUser = async (req, res, next) => {
+const authMiddlewareOwner = (req, res, next) => {
     try {
-        const token = req.cookies.ASPANEL_ELEMENT_TKN
+        const token = req.cookies.owner
         
         if (!token) {
             return res.status(401).json({
-                success: false,
+                success: false, 
                 message: "Нэвтрэх шаардлагатай.",
                 code: "NO_TOKEN"
             })
         }
 
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET)
-
+        
         req.user = decoded
 
         next()
@@ -23,7 +23,7 @@ const authMiddlewareUser = async (req, res, next) => {
         console.error("Auth middleware error:", err.name)
 
         // Cookie устгах
-        res.clearCookie('ASPANEL_ELEMENT_TKN', {
+        res.clearCookie('auth_token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -57,4 +57,4 @@ const authMiddlewareUser = async (req, res, next) => {
     }
 }
 
-module.exports = authMiddlewareUser
+module.exports = authMiddlewareOwner

@@ -26,11 +26,11 @@ router.route("/branches/:id")
 .put(UPDATE_BRANCHES)
 .delete(DELETE_BRANCHES)
 
-router.route("/autoschool/branches")
+router.route("/owner/branches")
 .get(authMiddlewareCourse, COURSE_GET_ALL_BRANCHES)
 .post(authMiddlewareCourse, COURSE_POST_BRANCHES)
 
-router.route("/autoschool/branches/:id")
+router.route("/owner/branches/:id")
 .get(authMiddlewareCourse, COURSE_GET_SINGLE_BRANCHES)
 .put(authMiddlewareCourse, COURSE_UPDATE_BRANCHES)
 .delete(authMiddlewareCourse, COURSE_DELETE_BRANCHES)

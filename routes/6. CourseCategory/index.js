@@ -36,4 +36,5 @@ router.route("/autoschool/course-category/:id")
 router.route("/admin/course-category")
 .get(authMiddlewareUser, ADMIN_GET_ALL_CATEGORY)
 
+
 module.exports = router

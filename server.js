@@ -35,6 +35,11 @@ const districtRoute = require("./routes/29. District")
 const wardRoute = require("./routes/30. Wards")
 const studentDetailRoute = require("./routes/31. CourseStudentDetails")
 const onlineRegisterRoute = require("./routes/32. OnlineRegister")
+const ownerRoute = require("./routes/33. Owners")
+const bankRoute = require("./routes/34. Bank")
+const courseAccountRoute = require("./routes/35. CourseAccount")
+const courseOwnerRoute = require("./routes/36. CourseOwners")
+const courseStudentAccessRoute = require("./routes/37. CourseStudentAccess")
 
 const app = express()
 
@@ -78,6 +83,11 @@ app.use(process.env.API_VERSION, districtRoute)
 app.use(process.env.API_VERSION, wardRoute)
 app.use(process.env.API_VERSION, studentDetailRoute)
 app.use(process.env.API_VERSION, onlineRegisterRoute)
+app.use(process.env.API_VERSION, ownerRoute)
+app.use(process.env.API_VERSION, bankRoute)
+app.use(process.env.API_VERSION, courseAccountRoute)
+app.use(process.env.API_VERSION, courseOwnerRoute)
+app.use(process.env.API_VERSION, courseStudentAccessRoute)
 
 app.use('/uploads', express.static('uploads'));
 
