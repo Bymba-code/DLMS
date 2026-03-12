@@ -7,7 +7,6 @@
     try {
       const { kode, password } = req.body;
 
-      // Validation
       if (!kode) {
         return res.status(400).json({
           success: false,
@@ -103,9 +102,7 @@
       });
 
 
-// Монгол цагт шилжүүлэх (UTC+8)
 
-// MySQL-д TIMESTAMP форматаар оруулах
 const mongoliaDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
 
 

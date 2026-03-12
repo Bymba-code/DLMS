@@ -5,9 +5,8 @@ const STAT_COURSE = async (req, res) => {
     try 
     {
         const user = req.user;
-        const { month } = req.query; // ?month=2024-12 эсвэл ?month=all
+        const { month } = req.query; 
 
-        // Parse month parameter
         let startDate = null;
 
         const exams = await prismaService.exam.findMany({
@@ -22,7 +21,6 @@ const STAT_COURSE = async (req, res) => {
         let endDate = null;
         
         if (month && month !== 'all') {
-            // Format: "2024-12" -> 2024 оны 12-р сар
             const [year, monthNum] = month.split('-').map(Number);
             
             if (year && monthNum >= 1 && monthNum <= 12) {
@@ -32,9 +30,7 @@ const STAT_COURSE = async (req, res) => {
                 endDate = new Date(year, monthNum, 1);
             }
         }
-        // month === 'all' эсвэл байхгүй бол бүх цаг үеийн өгөгдөл
 
-        // Build where clause for date filtering
         const dateFilter = startDate && endDate ? {
             created_at: {
                 gte: startDate,
@@ -42,7 +38,6 @@ const STAT_COURSE = async (req, res) => {
             }
         } : {};
 
-        // Fetch students
         const students = await prismaService.course_student.findMany({
             where: {
                 course: parseInt(user?.course)
