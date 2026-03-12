@@ -5,7 +5,7 @@ const STUDENT_TOPIC_TEST = async (req, res) => {
     try 
     {
         const student = req.user;
-        const { topic, testLength = 15 } = req.body; 
+        const { topic } = req.body; 
 
         const allTests = await prismaService.test.findMany({
             where: {
@@ -24,35 +24,16 @@ const STUDENT_TOPIC_TEST = async (req, res) => {
             });
         }
 
-        const requestedLength = parseInt(testLength);
-        if (isNaN(requestedLength) || requestedLength <= 0) {
-            return res.status(400).json({
-                success: false,
-                data: [],
-                message: 'Тестийн тоо буруу байна.'
-            });
-        }
-
-        const shuffled = [...allTests];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-
-        const randomTests = shuffled.slice(0, Math.min(requestedLength, allTests.length));
-
         return res.status(200).json({
             success: true,
-            data: randomTests,
+            data: allTests,
             total: allTests.length,
-            requested: requestedLength,
-            selected: randomTests.length,
             message: 'Амжилттай'
         });
     } 
     catch(err) 
     {
-        console.error('STUDENT_TOPIC_TEST error:', err);
+        console.log('STUDENT_TOPIC_TEST error:', err);
         return res.status(500).json({
             success: false,
             data: [],

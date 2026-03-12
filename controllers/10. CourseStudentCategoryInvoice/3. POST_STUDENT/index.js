@@ -5,6 +5,14 @@ const axios = require("axios")
 const STUDENT_POST_CATEGORY_INVOICE = async (req, res) => {
     try 
     {
+        const user = req.user;
+
+        const course = await prismaService.course.findUnique({
+            where:{
+                id:parseInt(user?.course)
+            }
+        })
+
         const { course_student_category, amount } = req.body;
 
         if(!course_student_category)
@@ -27,7 +35,7 @@ const STUDENT_POST_CATEGORY_INVOICE = async (req, res) => {
         const responseByl = await axios.post(`https://byl.mn/api/v1/projects/${process.env.PROJECT_ID}/invoices`,
                     {
                         amount: parseInt(amount),
-                        description: `СУРГАЛТИЙН ТӨЛБӨР`,
+                        description: `${course.name}`,
                         auto_advance:true
                     },
                     {
