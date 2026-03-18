@@ -40,6 +40,10 @@ const bankRoute = require("./routes/34. Bank")
 const courseAccountRoute = require("./routes/35. CourseAccount")
 const courseOwnerRoute = require("./routes/36. CourseOwners")
 const courseStudentAccessRoute = require("./routes/37. CourseStudentAccess")
+const subscriptionPlanRoute = require("./routes/38. SubscriptionPlans")
+const CourseSubscriptionPlanRoute = require("./routes/39. Subscription")
+const courseSubscriptionPlanInvoiceRoute = require("./routes/40. SubscriptionInvoice")
+const carTypeRoute = require("./routes/41. CarType")
 
 const app = express()
 
@@ -88,6 +92,10 @@ app.use(process.env.API_VERSION, bankRoute)
 app.use(process.env.API_VERSION, courseAccountRoute)
 app.use(process.env.API_VERSION, courseOwnerRoute)
 app.use(process.env.API_VERSION, courseStudentAccessRoute)
+app.use(process.env.API_VERSION, subscriptionPlanRoute)
+app.use(process.env.API_VERSION, CourseSubscriptionPlanRoute)
+app.use(process.env.API_VERSION, courseSubscriptionPlanInvoiceRoute)
+app.use(process.env.API_VERSION, carTypeRoute)
 
 app.use('/uploads', express.static('uploads'));
 
