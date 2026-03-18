@@ -34,7 +34,11 @@ const COURSE_GET_ALL_DRIVING_SCHEDULE = async (req, res) => {
         } : null;
 
         const include = {category_driving_schedule_categoryTocategory:true,
-                course_cars:true,
+                course_cars:{
+                    include:{
+                        car_type:true
+                    }
+                },
                 course_student_driving_schedule_course_student_driving_schedule_driving_scheduleTodriving_schedule:true,
                 course_teachers:true
             };

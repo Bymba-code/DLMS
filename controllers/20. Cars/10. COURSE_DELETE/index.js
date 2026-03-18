@@ -4,6 +4,7 @@ const prismaService = require("../../../services/prismaService");
 const COURSE_DELETE_CARS = async (req , res) => {
     try 
     {
+        const user = req.user;
         const { id } = req.params;
 
         if (!id || isNaN(id)) {
@@ -17,7 +18,7 @@ const COURSE_DELETE_CARS = async (req , res) => {
         const data = await prismaService.course_cars.findFirst({
             where: {
                 id: parseInt(id),
-                course: parseInt(course?.id)
+                course: parseInt(user?.course)
             }
         })
 

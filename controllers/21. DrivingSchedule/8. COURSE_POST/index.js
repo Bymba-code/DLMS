@@ -65,7 +65,7 @@ const COURSE_POST_DRIVING_SCHEDULE = async (req , res) => {
             })
         }
 
-        const existCategory = await prismaService.category.findUnique({
+        const existCategory = await prismaService.course_category.findUnique({
             where: {
                 id: parseInt(category)
             }
@@ -95,7 +95,7 @@ const COURSE_POST_DRIVING_SCHEDULE = async (req , res) => {
             })
         }
         
-        await insertData(res, { model: 'driving_schedule', data: { course: parseInt(user?.course), category:parseInt(category), teacher: parseInt(teacher), car:parseInt(car), area, schedule_date:new Date(schedule_date), start_time:new Date(start_time), end_time: new Date(end_time),  note: note ? note : "", add_date: new Date()  }})
+        await insertData(res, { model: 'driving_schedule', data: { course: parseInt(user?.course), category:parseInt(existCategory?.category), teacher: parseInt(teacher), car:parseInt(car), area, schedule_date:new Date(schedule_date), start_time:new Date(start_time), end_time: new Date(end_time),  note: note ? note : "", add_date: new Date()  }})
 
     }
     catch(err)

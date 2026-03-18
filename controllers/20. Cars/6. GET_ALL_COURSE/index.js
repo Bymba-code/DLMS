@@ -1,4 +1,5 @@
 const { storeData } = require("../../../services/controllerService");
+const prismaService = require("../../../services/prismaService");
 
 const COURSE_GET_ALL_CARS = async (req, res) => {
     try 
@@ -25,7 +26,9 @@ const COURSE_GET_ALL_CARS = async (req, res) => {
             value: search
         } : null;
 
-        const include = {};
+        const include = { 
+            car_type:true
+        };
 
         return await storeData(res, 'course_cars', {
             where,
