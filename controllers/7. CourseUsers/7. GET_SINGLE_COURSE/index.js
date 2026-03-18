@@ -19,7 +19,7 @@ const COURSE_GET_SINGLE_USER = async (req, res) => {
         const existData = await prismaService.course_users.findFirst({
             where: {
                 id: parseInt(id),
-                course: parseInt(course?.id)
+                course: parseInt(course?.course)
             }
         })  
 

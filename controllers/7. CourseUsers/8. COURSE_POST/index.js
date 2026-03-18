@@ -85,7 +85,7 @@ const COURSE_POST_USER = async (req , res) => {
         const existData = await prismaService.course_users.findFirst({
             where: {
                 kode:kode,
-                course:parseInt(course.id)
+                course:parseInt(course.course)
             }
         })
         
@@ -105,7 +105,7 @@ const COURSE_POST_USER = async (req , res) => {
 
         const result = await prismaService.course_users.create({
             data: {
-                course:parseInt(course.id),
+                course:parseInt(course.course),
                 firstname:firstname,
                 lastname:lastname,
                 register:register,

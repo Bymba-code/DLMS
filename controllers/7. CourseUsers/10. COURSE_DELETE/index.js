@@ -18,7 +18,7 @@ const DELETE_COURSE_USER = async (req , res) => {
         const data = await prismaService.course_users.findFirst({
             where: {
                 id: parseInt(id),
-                course: course.id
+                course: course.course
             }
         })
 
