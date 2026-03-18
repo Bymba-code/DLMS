@@ -21,7 +21,7 @@ const COURSE_POST_LIMIT_INVOICE = async (req , res) => {
 
         const price = parseInt(limit) * parseInt(process.env.PRICE)
 
-         const responseByl = await axios.post(`https://byl.mn/api/v1/projects/${process.env.PROJECT_ID}/invoices`,
+        const responseByl = await axios.post(`https://byl.mn/api/v1/projects/${process.env.PROJECT_ID}/invoices`,
             {
                 amount: parseInt(price),
                 description: `${ course?.id }, НЭХЭМЖЛЭЛИЙН ТӨЛБӨР`,
