@@ -12,6 +12,7 @@ const COURSE_UPDATE_CATEGORY = require("../../controllers/6. CourseCategory/9. C
 const COURSE_DELETE_CATEGORY = require("../../controllers/6. CourseCategory/10. COURSE_DELETE")
 const authMiddlewareUser = require("../../middlewares/userCookieAuth")
 const ADMIN_GET_ALL_CATEGORY = require("../../controllers/6. CourseCategory/11. ADMIN")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -25,16 +26,16 @@ router.route("/course-category/:id")
 .delete(DELETE_COURSE_CATEGORY)
 
 router.route("/autoschool/course-category")
-.get(authMiddlewareCourse, COURSE_GET_ALL_CATEGORY)
-.post(authMiddlewareCourse, COURSE_POST_CATEGORY)
+.get(authMiddlewareUser, checkSubscription, COURSE_GET_ALL_CATEGORY)
+.post(authMiddlewareUser, checkSubscription, COURSE_POST_CATEGORY)
 
 router.route("/autoschool/course-category/:id")
-.get(authMiddlewareCourse, COURSE_GET_SINGLE_CATEGORY)
-.put(authMiddlewareCourse, COURSE_UPDATE_CATEGORY)
-.delete(authMiddlewareCourse, COURSE_DELETE_CATEGORY)
+.get(authMiddlewareUser, checkSubscription, COURSE_GET_SINGLE_CATEGORY)
+.put(authMiddlewareUser, checkSubscription, COURSE_UPDATE_CATEGORY)
+.delete(authMiddlewareUser, checkSubscription, COURSE_DELETE_CATEGORY)
 
 router.route("/admin/course-category")
-.get(authMiddlewareUser, ADMIN_GET_ALL_CATEGORY)
+.get(authMiddlewareUser, checkSubscription, ADMIN_GET_ALL_CATEGORY)
 
 
 module.exports = router

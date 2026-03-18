@@ -11,6 +11,7 @@ const STUDENT_GET_SINGLE_DETAILS = require("../../controllers/31. CourseStudentD
 const STUDENT_POST_DETAILS = require("../../controllers/31. CourseStudentDetails/8. STUDENT_POST")
 const STUDENT_UPDATE_DETAILS = require("../../controllers/31. CourseStudentDetails/9. STUDENT_UPDATE")
 const STUDENT_DELETE_DETAILS = require("../../controllers/31. CourseStudentDetails/10. STUDENT_DELETE")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 

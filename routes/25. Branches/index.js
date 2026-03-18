@@ -14,6 +14,7 @@ const COURSE_POST_BRANCHES = require("../../controllers/25. Branches/8. COURSE_P
 const COURSE_UPDATE_BRANCHES = require("../../controllers/25. Branches/9. COURSE_UPDATE")
 const COURSE_DELETE_BRANCHES = require("../../controllers/25. Branches/10. COURSE_DELETE")
 const ADMIN_GET_ALL_BRANCHES = require("../../controllers/25. Branches/11. ADMIN.GET.ALL")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -26,16 +27,16 @@ router.route("/branches/:id")
 .put(UPDATE_BRANCHES)
 .delete(DELETE_BRANCHES)
 
-router.route("/owner/branches")
-.get(authMiddlewareCourse, COURSE_GET_ALL_BRANCHES)
-.post(authMiddlewareCourse, COURSE_POST_BRANCHES)
+router.route("/autoschool/branches")
+.get(authMiddlewareUser,  checkSubscription,COURSE_GET_ALL_BRANCHES)
+.post(authMiddlewareUser,  checkSubscription,COURSE_POST_BRANCHES)
 
-router.route("/owner/branches/:id")
-.get(authMiddlewareCourse, COURSE_GET_SINGLE_BRANCHES)
-.put(authMiddlewareCourse, COURSE_UPDATE_BRANCHES)
-.delete(authMiddlewareCourse, COURSE_DELETE_BRANCHES)
+router.route("/autoschool/branches/:id")
+.get(authMiddlewareUser,  checkSubscription,COURSE_GET_SINGLE_BRANCHES)
+.put(authMiddlewareUser,  checkSubscription,COURSE_UPDATE_BRANCHES)
+.delete(authMiddlewareUser  ,  checkSubscription,COURSE_DELETE_BRANCHES)
 
 router.route("/admin/branches")
-.get(authMiddlewareUser, ADMIN_GET_ALL_BRANCHES)
+.get(authMiddlewareUser, checkSubscription,ADMIN_GET_ALL_BRANCHES)
 
 module.exports = router

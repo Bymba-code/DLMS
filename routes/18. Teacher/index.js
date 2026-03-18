@@ -15,6 +15,7 @@ const LOGIN_TEACHER = require("../../controllers/18. Teacher/11. LOGIN")
 const authMiddlewareTeacher = require("../../middlewares/teacherCookieAuth")
 const ME_TEACHER = require("../../controllers/18. Teacher/12. ME")
 const authMiddlewareUser = require("../../middlewares/userCookieAuth")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -28,13 +29,13 @@ router.route("/teacher/:id")
 .delete(DELETE_TEACHER)
 
 router.route("/autoschool/teacher")
-.get(authMiddlewareUser, COURSE_GET_ALL_TEACHER)
-.post(authMiddlewareUser, COURSE_POST_TEACHER)
+.get(authMiddlewareUser, checkSubscription,  COURSE_GET_ALL_TEACHER)
+.post(authMiddlewareUser, checkSubscription,  COURSE_POST_TEACHER)
 
 router.route("/autoschool/teacher/:id")
-.get(authMiddlewareUser, COURSE_GET_SINGLE_TEACHER)
-.put(authMiddlewareUser, COURSE_UPDATE_TEACHER)
-.delete(authMiddlewareUser, COURSE_DELETE_TEACHER)
+.get(authMiddlewareUser, checkSubscription,  COURSE_GET_SINGLE_TEACHER)
+.put(authMiddlewareUser, checkSubscription,  COURSE_UPDATE_TEACHER)
+.delete(authMiddlewareUser, checkSubscription,  COURSE_DELETE_TEACHER)
 
 router.route("/me/teacher")
 .get(authMiddlewareTeacher, ME_TEACHER)

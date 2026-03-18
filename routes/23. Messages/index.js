@@ -17,6 +17,7 @@ const STUDENT_GET_ALL_MESSAGE = require("../../controllers/23. Messages/11. STUD
 const STUDENT_GET_SINGLE_MESSAGE = require("../../controllers/23. Messages/12. STUDENT_GET_SINGLE")
 const STUDENT_UPDATE_MESSAGE = require("../../controllers/23. Messages/13. STUDENT_UPDATE")
 const STUDENT_GET_MESSAGE_COUNT = require("../../controllers/23. Messages/14. STUDENT_COUNT")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -29,15 +30,14 @@ router.route("/message/:id")
 .put(UPDATE_MESSAGE)
 .delete(DELETE_MESSAGE)
 
-
 router.route("/autoschool/message")
-.get(authMiddlewareUser, COURSE_GET_ALL_MESSAGE)
-.post(authMiddlewareUser, COURSE_POST_MESSAGE)
+.get(authMiddlewareUser, checkSubscription, COURSE_GET_ALL_MESSAGE)
+.post(authMiddlewareUser, checkSubscription, COURSE_POST_MESSAGE)
 
 router.route("/autoschool/message/:id")
-.get(authMiddlewareUser, COURSE_GET_SINGLE_MESSAGE)
-.put(authMiddlewareUser, COURSE_UPDATE_MESSAGE)
-.delete(authMiddlewareUser, COURSE_DELETE_MESSAGE)
+.get(authMiddlewareUser, checkSubscription, COURSE_GET_SINGLE_MESSAGE)
+.put(authMiddlewareUser, checkSubscription, COURSE_UPDATE_MESSAGE)
+.delete(authMiddlewareUser, checkSubscription, COURSE_DELETE_MESSAGE)
 
 router.route("/student/message")
 .get(authMiddlewareStudent, STUDENT_GET_ALL_MESSAGE)

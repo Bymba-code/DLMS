@@ -10,6 +10,8 @@ const OWNER_POST_COURSE_ACCOUNT = require("../../controllers/35. CourseAccount/8
 const OWNER_GET_SINGLE_COURSE_ACCOUNT = require("../../controllers/35. CourseAccount/7. OWNER_GET_SINGLE")
 const OWNER_UPDATE_COURSE_ACCOUNT = require("../../controllers/35. CourseAccount/9. OWNER_UPDATE")
 const OWNER_DELETE_COURSE_ACCOUNT = require("../../controllers/35. CourseAccount/10. OWNER_DELETE")
+const authMiddlewareUser = require("../../middlewares/userCookieAuth")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -22,14 +24,14 @@ router.route("/course-account/:id")
 .put(UPDATE_COURSE_ACCOUNT)
 .delete(DELETE_COURSE_ACCOUNT)
 
-router.route("/owner/course-account")
-.get(authMiddlewareCourse, OWNER_GET_ALL_COURSE_ACCOUNT)
-.post(authMiddlewareCourse, OWNER_POST_COURSE_ACCOUNT)
+router.route("/autoschool/course-account")
+.get(authMiddlewareUser, checkSubscription,  OWNER_GET_ALL_COURSE_ACCOUNT)
+.post(authMiddlewareUser, checkSubscription,  OWNER_POST_COURSE_ACCOUNT)
 
-router.route("/owner/course-account/:id")
-.get(authMiddlewareCourse, OWNER_GET_SINGLE_COURSE_ACCOUNT)
-.put(authMiddlewareCourse, OWNER_UPDATE_COURSE_ACCOUNT)
-.delete(authMiddlewareCourse, OWNER_DELETE_COURSE_ACCOUNT)
+router.route("/autoschool/course-account/:id")
+.get(authMiddlewareUser, checkSubscription,  OWNER_GET_SINGLE_COURSE_ACCOUNT)
+.put(authMiddlewareUser, checkSubscription,  OWNER_UPDATE_COURSE_ACCOUNT)
+.delete(authMiddlewareUser, checkSubscription,  OWNER_DELETE_COURSE_ACCOUNT)
 
 
 module.exports = router

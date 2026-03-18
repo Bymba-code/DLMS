@@ -16,6 +16,7 @@ const authMiddlewareStudent = require("../../middlewares/studentCookieAuth")
 const STUDENT_GET_STAT = require("../../controllers/8. CourseStudent/13. STAT")
 const COURSE_STUDENT_REPORT = require("../../controllers/8. CourseStudent/14. SystemReport")
 const LOGOUT_STUDENT = require("../../controllers/8. CourseStudent/15. LOGOUT")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -29,13 +30,13 @@ router.route("/course-student/:id")
 .delete(DELETE_COURSE_STUDENT)
 
 router.route("/autoschool/course-student")
-.get(authMiddlewareUser, COURSE_GET_ALL_STUDENT)
-.post(authMiddlewareUser, COURSE_POST_STUDENT)
+.get(authMiddlewareUser,  checkSubscription, COURSE_GET_ALL_STUDENT)
+.post(authMiddlewareUser,  checkSubscription, COURSE_POST_STUDENT)
 
 router.route("/autoschool/course-student/:id")
-.get(authMiddlewareUser, COURSE_GET_SINGLE_STUDENT)
-.put(authMiddlewareUser, COURSE_UPDATE_STUDENT)
-.delete(authMiddlewareUser, COURSE_DELETE_STUDENT)
+.get(authMiddlewareUser, checkSubscription, COURSE_GET_SINGLE_STUDENT)
+.put(authMiddlewareUser, checkSubscription, COURSE_UPDATE_STUDENT)
+.delete(authMiddlewareUser, checkSubscription, COURSE_DELETE_STUDENT)
 
 router.route("/auth/login/student")
 .post(LOGIN_STUDENT)

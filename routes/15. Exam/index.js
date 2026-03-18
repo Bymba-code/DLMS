@@ -12,6 +12,7 @@ const STUDENT_GET_SINGLE_EXAM = require("../../controllers/15. Exam/8. STUDENT_G
 const STUDENT_POST_EXAM = require("../../controllers/15. Exam/9. STUDENT_POST")
 const STUDENT_UPDATE_EXAM = require("../../controllers/15. Exam/10. STUDENT_UPDATE")
 const authMiddlewareUser = require("../../middlewares/userCookieAuth")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -23,11 +24,11 @@ router.route("/exam/:id")
 .delete(DELETE_EXAM)
 
 router.route("/autoschool/exam")
-.get(authMiddlewareUser, COURSE_GET_ALL_EXAM)
+.get(authMiddlewareUser, checkSubscription,  COURSE_GET_ALL_EXAM)
 
 router.route("/autoschool/exam/:id")
-.get(authMiddlewareUser, COURSE_GET_SINGLE_EXAM)
-.delete(authMiddlewareUser, COURSE_DELETE_EXAM)
+.get(authMiddlewareUser, checkSubscription,  COURSE_GET_SINGLE_EXAM)
+.delete(authMiddlewareUser, checkSubscription,  COURSE_DELETE_EXAM)
 
 router.route("/student/exam")
 .get(authMiddlewareStudent, STUDENT_GET_ALL_EXAM)

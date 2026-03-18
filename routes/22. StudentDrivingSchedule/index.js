@@ -10,6 +10,11 @@ const DELETE_STUDENT_DRIVING_SCHEDULE = require("../../controllers/22. StudentDr
 const STUDENT_GET_ALL_DRIVING_SCHEDULE = require("../../controllers/22. StudentDrivingSchedule/6. STUDENT_GET_ALL")
 const TEACHER_POST_STUDENT_DRIVING_SCHEDULE = require("../../controllers/22. StudentDrivingSchedule/8. TEACHER_POST")
 const TEACHER_UPDATE_DRIVING_SCHEDULE = require("../../controllers/22. StudentDrivingSchedule/9. TEACHER_UPDATE")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
+const authMiddlewareUser = require("../../middlewares/userCookieAuth")
+const COURSE_POST_STUDENT_DRIVING_SCHEDULE = require("../../controllers/22. StudentDrivingSchedule/10. COURSE_POST")
+const COURSE_UPDATE_STUDENT_DRIVING_SCHEDULE = require("../../controllers/22. StudentDrivingSchedule/11. COURSE_UPDATE")
+const COURSE_DELETE_STUDENT_DRIVING_SCHEDULE = require("../../controllers/22. StudentDrivingSchedule/12. COURSE_DELETE")
 
 const router = express.Router()
 
@@ -21,6 +26,13 @@ router.route("/student-driving-schedule/:id")
 .get(GET_SINGLE_STUDENT_DRIVING_SCHEDULE)
 .put(UPDATE_STUDENT_DRIVING_SCHEDULE)
 .delete(DELETE_STUDENT_DRIVING_SCHEDULE)
+
+router.route("/autoschool/student-driving-schedule")
+.post(authMiddlewareUser, COURSE_POST_STUDENT_DRIVING_SCHEDULE)
+
+router.route("/autoschool/student-driving-schedule/:id")
+.put(authMiddlewareUser, COURSE_UPDATE_STUDENT_DRIVING_SCHEDULE)
+.delete(authMiddlewareUser, COURSE_DELETE_STUDENT_DRIVING_SCHEDULE)
 
 router.route("/student/student-driving-schedule")
 .get(authMiddlewareStudent, STUDENT_GET_ALL_DRIVING_SCHEDULE)

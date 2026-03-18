@@ -4,6 +4,7 @@ const COURSE_POST_STUDENT_ACCESS = require("../../controllers/37. CourseStudentA
 const COURSE_UPDATE_STUDENT_ACCESS = require("../../controllers/37. CourseStudentAccess/2. COURSE_UPDATE")
 const COURSE_DELETE_STUDENT_ACCESS = require("../../controllers/37. CourseStudentAccess/5. COURSE_DELETE")
 const authMiddlewareUser = require("../../middlewares/userCookieAuth")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 

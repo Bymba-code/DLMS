@@ -12,6 +12,7 @@ const COURSE_POST_CARS = require("../../controllers/20. Cars/8. COURSE_POST")
 const COURSE_UPDATE_CARS = require("../../controllers/20. Cars/9. COURSE_UPDATE")
 const COURSE_DELETE_CARS = require("../../controllers/20. Cars/10. COURSE_DELETE")
 const authMiddlewareUser = require("../../middlewares/userCookieAuth")
+const checkSubscription = require("../../middlewares/subscriptionPlan")
 
 const router = express.Router()
 
@@ -25,12 +26,12 @@ router.route("/cars/:id")
 .delete(DELETE_CARS)
 
 router.route("/autoschool/cars")
-.get(authMiddlewareUser, COURSE_GET_ALL_CARS)
-.post(upload.single(`file`), authMiddlewareUser, COURSE_POST_CARS)
+.get(authMiddlewareUser, checkSubscription,  COURSE_GET_ALL_CARS)
+.post(upload.single(`file`),authMiddlewareUser,  checkSubscription,   COURSE_POST_CARS)
 
 router.route("/autoschool/cars/:id")
 .get(authMiddlewareUser, COURSE_GET_SINGLE_CARS)
-.put(upload.single(`file`), authMiddlewareUser, COURSE_UPDATE_CARS)
-.delete(authMiddlewareUser, COURSE_DELETE_CARS)
+.put(upload.single(`file`), authMiddlewareUser, checkSubscription,  COURSE_UPDATE_CARS)
+.delete(authMiddlewareUser,  checkSubscription,  COURSE_DELETE_CARS)
 
 module.exports = router

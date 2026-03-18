@@ -9,6 +9,7 @@ const ME_COURSE = require("../../controllers/1. Course/7. ME")
 const authMiddlewareCourse = require("../../middlewares/authMiddlewareCourse")
 const authMiddlewareUser = require("../../middlewares/userCookieAuth")
 const STAT_COURSE = require("../../controllers/1. Course/8. STAT")
+const LOGOUT_COURSE = require("../../controllers/1. Course/9. LOGOUT")
 
 const router = express.Router()
 
@@ -29,5 +30,8 @@ router.route("/me/course")
 
 router.route("/stat/course")
 .get(authMiddlewareUser, STAT_COURSE)
+
+router.route("/auth/logout/course")
+.get(authMiddlewareCourse, LOGOUT_COURSE)
 
 module.exports = router
