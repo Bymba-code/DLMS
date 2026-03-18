@@ -32,7 +32,7 @@ const OWNER_POST_COURSE_ACCOUNT = async (req , res) => {
             })
         }
 
-        await insertData(res, { model: 'course_account', data: { course:parseInt(owner?.id), bank:parseInt(bank), iban, account, active: active ? 1 : 0, created_at: new Date()}})
+        await insertData(res, { model: 'course_account', data: { course:parseInt(owner?.course), bank:parseInt(bank), iban, account, active: active ? 1 : 0, created_at: new Date()}})
     }
     catch(err)
     {

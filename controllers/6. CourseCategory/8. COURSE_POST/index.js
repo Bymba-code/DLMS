@@ -50,7 +50,7 @@ const COURSE_POST_CATEGORY = async (req , res) => {
 
         const dataExist = await prismaService.course_category.findFirst({
             where: {
-                course: parseInt(course.id),
+                course: parseInt(course.course),
                 category: category
             }
         })
@@ -64,7 +64,7 @@ const COURSE_POST_CATEGORY = async (req , res) => {
             })
         }
         
-        await insertData(res, { model: 'course_category', data: { course: parseInt(course?.id), category:parseInt(category), registerPrice:parseInt(registerPrice), price:parseInt(price), active: active ? 1 : 0, created_at: new Date()}})
+        await insertData(res, { model: 'course_category', data: { course: parseInt(course?.course), category:parseInt(category), registerPrice:parseInt(registerPrice), price:parseInt(price), active: active ? 1 : 0, created_at: new Date()}})
     }
     catch(err)
     {

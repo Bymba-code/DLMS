@@ -8,165 +8,180 @@ const STAT_COURSE = async (req, res) => {
         const { month } = req.query; 
 
         let startDate = null;
-
-        const exams = await prismaService.exam.findMany({
-            where: {
-                course:parseInt(user.course)
-            },
-            include:{
-                course_student:true,
-                category_exam_categoryTocategory:true
-            }
-        })
-        let endDate = null;
+        let endDate   = null;
         
         if (month && month !== 'all') {
             const [year, monthNum] = month.split('-').map(Number);
-            
             if (year && monthNum >= 1 && monthNum <= 12) {
-                // Тухайн сарын эхний өдөр
                 startDate = new Date(year, monthNum - 1, 1);
-                // Дараа сарын эхний өдөр (тухайн сарын сүүлийн өдрийг олох)
-                endDate = new Date(year, monthNum, 1);
+                endDate   = new Date(year, monthNum, 1);
             }
         }
 
-        const dateFilter = startDate && endDate ? {
-            created_at: {
-                gte: startDate,
-                lt: endDate
-            }
-        } : {};
+        const dateFilter = startDate && endDate
+            ? { created_at: { gte: startDate, lt: endDate } }
+            : {};
 
-        const students = await prismaService.course_student.findMany({
-            where: {
-                course: parseInt(user?.course)
+        // ── Exams ───────────────────────────────────────────────────────
+        const exams = await prismaService.exam.findMany({
+            where: { course: parseInt(user.course) },
+            include: {
+                course_student: {
+                    select: { id: true, firstname: true, lastname: true, kode: true, phone: true }
+                },
+                category_exam_categoryTocategory: {
+                    select: { id: true, name: true }
+                },
+                exam_test_exam_test_examToexam: {
+                    select: { id: true, isSuccess: true }
+                }
             },
+            orderBy: { date: "desc" }
+        });
+
+        // ── Students with payments ──────────────────────────────────────
+        const students = await prismaService.course_student.findMany({
+            where: { course: parseInt(user?.course) },
             include: {
                 course_student_category: {
                     include: {
                         course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category: {
-                            where: dateFilter // Сараар шүүнэ
+                            where: dateFilter
                         }
                     }
                 }
             }
         });
 
-        // Fetch system rental invoices with date filter
-        const systemRentalWhere = {
-            course: parseInt(user?.course),
-            status: "paid",
-            ...(startDate && endDate && {
-                created_at: {
-                    gte: startDate,
-                    lt: endDate
+        // ── Branches ────────────────────────────────────────────────────
+        const branches = await prismaService.branches.findMany({
+            where: { course: parseInt(user?.course) },
+            include: {
+                course_student: {
+                    select: {
+                        id:        true,
+                        firstname: true,
+                        lastname:  true,
+                        kode:      true,
+                        phone:     true,
+                        date:      true,
+                        course_student_category: {
+                            select: {
+                                payment: true,
+                                course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category: {
+                                    where: dateFilter,
+                                    select: { status: true, amount: true }
+                                }
+                            }
+                        }
+                    }
                 }
-            })
-        };
+            }
+        });
 
+        // ── System rental invoices ──────────────────────────────────────
+        const systemRentalWhere = {
+            course:  parseInt(user?.course),
+            status:  "paid",
+            ...(startDate && endDate && { created_at: { gte: startDate, lt: endDate } })
+        };
         const systemRentalInvoice = await prismaService.course_system_rental.findMany({
             where: systemRentalWhere
         });
 
-        // Current date
-        const now = new Date();
-
-        // Calculate total system rental expenses
-        let systemRentalExpenses = 0;
-        const activeRentals = [];
-        const expiredRentals = [];
-        
-        systemRentalInvoice.forEach(invoice => {
-            systemRentalExpenses += parseFloat(invoice.amount) || 0;
-            
-            const startDateRental = new Date(invoice.start_date);
-            const endDateRental = new Date(invoice.end_date);
-            
-            if (startDateRental <= now && endDateRental >= now) {
-                activeRentals.push(invoice);
-            } else {
-                expiredRentals.push(invoice);
-            }
-        });
-
-        // Find latest active system rental
-        const sortedActiveRentals = activeRentals
-            .sort((a, b) => new Date(b.end_date) - new Date(a.end_date));
-        
-        const latestActiveRental = sortedActiveRentals.length > 0 ? sortedActiveRentals[0] : null;
-
-        // Fetch limit invoices with date filter
+        // ── Limit invoices ──────────────────────────────────────────────
         const limitBoughtWhere = {
-            course: parseInt(user?.course),
-            status: "paid",
-            ...(startDate && endDate && {
-                created_at: {
-                    gte: startDate,
-                    lt: endDate
-                }
-            })
+            course:  parseInt(user?.course),
+            status:  "paid",
+            ...(startDate && endDate && { created_at: { gte: startDate, lt: endDate } })
         };
-
         const limitBoughtInvoices = await prismaService.course_limit_invoice.findMany({
             where: limitBoughtWhere
         });
 
-        // Calculate total expenses from limit invoices
-        let limitExpenses = 0;
-        let totalLimitsBought = 0;
-        
-        limitBoughtInvoices.forEach(invoice => {
-            limitExpenses += parseFloat(invoice.amount) || 0;
-            totalLimitsBought += parseInt(invoice.limit) || 0;
+        const allLimitInvoices = await prismaService.course_limit_invoice.findMany({
+            where: { course: parseInt(user?.course), status: "paid" }
         });
 
-        // Calculate payment statistics
-        let totalAmount = 0;
-        let paidAmount = 0;
-        let remainingAmount = 0;
-        let totalInvoices = 0;
-        let paidInvoices = 0;
-        let unpaidInvoices = 0;
-        let cancelledInvoices = 0;
+        // ── System rental calculations ──────────────────────────────────
+        const now = new Date();
+        let systemRentalExpenses = 0;
+        const activeRentals  = [];
+        const expiredRentals = [];
 
-        // Process each student
+        systemRentalInvoice.forEach(inv => {
+            systemRentalExpenses += parseFloat(inv.amount) || 0;
+            const s = new Date(inv.start_date), e = new Date(inv.end_date);
+            if (s <= now && e >= now) activeRentals.push(inv);
+            else                      expiredRentals.push(inv);
+        });
+
+        const latestActiveRental = activeRentals
+            .sort((a, b) => new Date(b.end_date) - new Date(a.end_date))[0] || null;
+
+        // ── Limit calculations ──────────────────────────────────────────
+        let limitExpenses      = 0;
+        let totalLimitsBought  = 0;
+        limitBoughtInvoices.forEach(inv => {
+            limitExpenses     += parseFloat(inv.amount) || 0;
+            totalLimitsBought += parseInt(inv.limit)   || 0;
+        });
+
+        let allTotalLimitsBought = 0;
+        allLimitInvoices.forEach(inv => { allTotalLimitsBought += parseInt(inv.limit) || 0; });
+
+        // ── Payment statistics ──────────────────────────────────────────
+        let totalAmount        = 0;
+        let paidAmount         = 0;
+        let totalInvoices      = 0;
+        let paidInvoices       = 0;
+        let unpaidInvoices     = 0;
+        let cancelledInvoices  = 0;
+        const allPaidInvoicesRaw = [];
+
         students.forEach(student => {
-            student.course_student_category.forEach(category => {
-                // Хэрвээ сараар шүүж байгаа бол, зөвхөн тухайн сард үүссэн нэхэмжлэлүүдийг тооцоолно
-                const payments = category.course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category || [];
-                
-                if (startDate && endDate) {
-                    // Сараар шүүж байгаа тохиолдолд зөвхөн тухайн сарын төлбөрүүд
-                    payments.forEach(payment => {
-                        totalInvoices++;
-                        const invoiceAmount = parseFloat(payment.amount) || 0;
-                        totalAmount += invoiceAmount;
+            student.course_student_category.forEach(cat => {
+                const payments = cat
+                    .course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category
+                    || [];
 
-                        if (payment.status === 'paid') {
-                            paidAmount += invoiceAmount;
+                if (startDate && endDate) {
+                    payments.forEach(p => {
+                        totalInvoices++;
+                        const amt = parseFloat(p.amount) || 0;
+                        totalAmount += amt;
+                        if (p.status === 'paid') {
+                            paidAmount += amt;
                             paidInvoices++;
-                        } else if (payment.status === 'cancelled') {
+                            allPaidInvoicesRaw.push({
+                                ...p,
+                                studentName: `${student.lastname} ${student.firstname}`,
+                                studentId:   student.id,
+                                phone:       student.phone,
+                            });
+                        } else if (p.status === 'cancelled') {
                             cancelledInvoices++;
-                        } else if (payment.status === 'open') {
+                        } else if (p.status === 'open') {
                             unpaidInvoices++;
                         }
                     });
                 } else {
-                    // Бүх цаг үеийн өгөгдөл
-                    const categoryPayment = parseFloat(category.payment) || 0;
-                    totalAmount += categoryPayment;
-
-                    payments.forEach(payment => {
+                    totalAmount += parseFloat(cat.payment) || 0;
+                    payments.forEach(p => {
                         totalInvoices++;
-                        const invoiceAmount = parseFloat(payment.amount) || 0;
-
-                        if (payment.status === 'paid') {
-                            paidAmount += invoiceAmount;
+                        const amt = parseFloat(p.amount) || 0;
+                        if (p.status === 'paid') {
+                            paidAmount += amt;
                             paidInvoices++;
-                        } else if (payment.status === 'cancelled') {
+                            allPaidInvoicesRaw.push({
+                                ...p,
+                                studentName: `${student.lastname} ${student.firstname}`,
+                                studentId:   student.id,
+                                phone:       student.phone,
+                            });
+                        } else if (p.status === 'cancelled') {
                             cancelledInvoices++;
-                        } else if (payment.status === 'open') {
+                        } else if (p.status === 'open') {
                             unpaidInvoices++;
                         }
                     });
@@ -174,85 +189,51 @@ const STAT_COURSE = async (req, res) => {
             });
         });
 
-        // Calculate remaining amount
-        remainingAmount = totalAmount - paidAmount;
+        // ── Last 10 paid invoices ───────────────────────────────────────
+        const lastTenPaidInvoices = allPaidInvoicesRaw
+            .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at))
+            .slice(0, 10);
 
-        // Calculate percentages
-        const paymentPercentage = totalAmount > 0 
-            ? Math.round((paidAmount / totalAmount) * 100) 
-            : 0;
-
-        // Total expenses
-        const totalExpenses = systemRentalExpenses + limitExpenses;
-
-        // Get last 3 paid invoices (from filtered data)
-        const allPaidInvoices = [];
-        students.forEach(student => {
-            student.course_student_category.forEach(category => {
-                const payments = category.course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category || [];
-                
-                payments.forEach(payment => {
-                    if (payment.status === 'paid') {
-                        allPaidInvoices.push({
-                            ...payment,
-                            studentName: `${student.lastname} ${student.firstname}`,
-                            studentId: student.id
-                        });
-                    }
-                });
-            });
-        });
-
-        const lastThreePaidInvoices = allPaidInvoices
-            .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-            .slice(0, 3);
-
-        // Get students with remaining balance (from filtered data)
+        // ── Students with debt ──────────────────────────────────────────
         const studentsWithDebt = [];
+
         students.forEach(student => {
             let studentTotal = 0;
-            let studentPaid = 0;
+            let studentPaid  = 0;
 
-            student.course_student_category.forEach(category => {
-                const payments = category.course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category || [];
-                
+            student.course_student_category.forEach(cat => {
+                const payments = cat
+                    .course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category
+                    || [];
+
                 if (startDate && endDate) {
-                    // Сараар шүүж байгаа тохиолдолд
-                    payments.forEach(payment => {
-                        const amount = parseFloat(payment.amount) || 0;
-                        studentTotal += amount;
-                        
-                        if (payment.status === 'paid') {
-                            studentPaid += amount;
-                        }
+                    payments.forEach(p => {
+                        const amt = parseFloat(p.amount) || 0;
+                        studentTotal += amt;
+                        if (p.status === 'paid') studentPaid += amt;
                     });
                 } else {
-                    // Бүх цаг үеийн өгөгдөл
-                    studentTotal += parseFloat(category.payment) || 0;
-                    
-                    payments.forEach(payment => {
-                        if (payment.status === 'paid') {
-                            studentPaid += parseFloat(payment.amount) || 0;
-                        }
+                    studentTotal += parseFloat(cat.payment) || 0;
+                    payments.forEach(p => {
+                        if (p.status === 'paid') studentPaid += parseFloat(p.amount) || 0;
                     });
                 }
             });
 
             const remaining = studentTotal - studentPaid;
-
             if (remaining > 0) {
                 studentsWithDebt.push({
-                    id: student.id,
-                    studentName: `${student.lastname} ${student.firstname}`,
-                    familyname: student.familyname,
-                    firstname: student.firstname,
-                    lastname: student.lastname,
-                    phone: student.phone,
-                    totalAmount: studentTotal,
-                    paidAmount: studentPaid,
+                    id:              student.id,
+                    studentName:     `${student.lastname} ${student.firstname}`,
+                    familyname:      student.familyname,
+                    firstname:       student.firstname,
+                    lastname:        student.lastname,
+                    phone:           student.phone,
+                    totalAmount:     studentTotal,
+                    paidAmount:      studentPaid,
                     remainingAmount: remaining,
-                    paymentProgress: studentTotal > 0 
-                        ? Math.round((studentPaid / studentTotal) * 100) 
+                    paymentProgress: studentTotal > 0
+                        ? Math.round((studentPaid / studentTotal) * 100)
                         : 0
                 });
             }
@@ -260,119 +241,175 @@ const STAT_COURSE = async (req, res) => {
 
         studentsWithDebt.sort((a, b) => b.remainingAmount - a.remainingAmount);
 
-        // Get last 5 exams
-        const lastFiveExams = exams
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-            .slice(0, 5)
-            .map(exam => ({
-                id: exam.id,
-                name: exam.name,
-                categoryName: exam.category_exam_categoryTocategory?.name || 'Ангилал байхгүй',
-                totalStudents: exam.course_student?.length || 0,
-                createdAt: exam.created_at,
-                duration: exam.time,
-                questionCount: exam.question_count
-            }));
-
-        // Calculate student limits (бүх цаг үеийн)
-        const allLimitInvoices = await prismaService.course_limit_invoice.findMany({
-            where: {
-                course: parseInt(user?.course),
-                status: "paid"
-            }
+        // ── Last 10 exams ───────────────────────────────────────────────
+        const lastTenExams = exams.slice(0, 10).map(e => {
+            const tests        = e.exam_test_exam_test_examToexam || [];
+            const totalTests   = tests.length;
+            const correctTests = tests.filter(t => t.isSuccess === 1).length;
+            const progressPct  = e.progress != null
+                ? Math.round(e.progress)
+                : totalTests > 0 ? Math.round((correctTests / totalTests) * 100) : 0;
+            const s = e.course_student;
+            return {
+                id:           e.id,
+                studentName:  s ? `${s.lastname || ""} ${s.firstname || ""}`.trim() || "—" : "—",
+                studentId:    e.student,
+                studentKode:  s?.kode  || null,
+                studentPhone: s?.phone || null,
+                categoryName: e.category_exam_categoryTocategory?.name || "Ангилал байхгүй",
+                progress:     progressPct,
+                isMake:       e.isMake,
+                success:      e.success  ?? correctTests,
+                wrong:        e.wrong    ?? (totalTests - correctTests),
+                totalTests,
+                createdAt:    e.date,
+                endDate:      e.end_date,
+            };
         });
 
-        let allTotalLimitsBought = 0;
-        allLimitInvoices.forEach(invoice => {
-            allTotalLimitsBought += parseInt(invoice.limit) || 0;
+        // ── Branch statistics ───────────────────────────────────────────
+        const branchStats = branches.map(branch => {
+            const branchStudents = branch.course_student || [];
+            let branchTotal = 0, branchPaid = 0;
+
+            branchStudents.forEach(st => {
+                (st.course_student_category || []).forEach(cat => {
+                    const payments = cat
+                        .course_student_category_payments_course_student_category_payments_course_student_categoryTocourse_student_category
+                        || [];
+                    if (startDate && endDate) {
+                        payments.forEach(p => {
+                            const amt = parseFloat(p.amount) || 0;
+                            branchTotal += amt;
+                            if (p.status === 'paid') branchPaid += amt;
+                        });
+                    } else {
+                        branchTotal += parseFloat(cat.payment) || 0;
+                        payments.forEach(p => {
+                            if (p.status === 'paid') branchPaid += parseFloat(p.amount) || 0;
+                        });
+                    }
+                });
+            });
+
+            const recentStudents = branchStudents
+                .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+                .slice(0, 3)
+                .map(s => ({
+                    id:    s.id,
+                    name:  `${s.lastname || ""} ${s.firstname || ""}`.trim() || "—",
+                    kode:  s.kode,
+                    phone: s.phone,
+                    date:  s.date,
+                }));
+
+            return {
+                id:              branch.id,
+                name:            branch.name     || "Нэргүй салбар",
+                code:            branch.code     || null,
+                phone:           branch.phone    || null,
+                email:           branch.email    || null,
+                location:        branch.location || null,
+                active:          branch.active,
+                studentCount:    branchStudents.length,
+                totalAmount:     branchTotal,
+                paidAmount:      branchPaid,
+                remainingAmount: branchTotal - branchPaid,
+                paymentPct:      branchTotal > 0
+                    ? Math.round((branchPaid / branchTotal) * 100) : 0,
+                recentStudents,
+            };
         });
 
-        const totalStudentsRegistered = students.length;
-        const remainingLimit = allTotalLimitsBought - totalStudentsRegistered;
-        const limitUsagePercentage = allTotalLimitsBought > 0 
-            ? Math.round((totalStudentsRegistered / allTotalLimitsBought) * 100) 
-            : 0;
+        branchStats.sort((a, b) => b.studentCount - a.studentCount);
 
-        // Calculate net profit
-        const netProfit = paidAmount - totalExpenses;
-        const profitMargin = paidAmount > 0 
-            ? Math.round((netProfit / paidAmount) * 100) 
-            : 0;
+        // ── Calculations ────────────────────────────────────────────────
+        const remainingAmount   = totalAmount - paidAmount;
+        const paymentPercentage = totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
+        const totalExpenses     = systemRentalExpenses + limitExpenses;
+        const netProfit         = paidAmount - totalExpenses;
+        const profitMargin      = paidAmount > 0 ? Math.round((netProfit / paidAmount) * 100) : 0;
+        const totalStudentsReg  = students.length;
+        const remainingLimit    = allTotalLimitsBought - totalStudentsReg;
+        const limitUsagePct     = allTotalLimitsBought > 0
+            ? Math.round((totalStudentsReg / allTotalLimitsBought) * 100) : 0;
 
-        // Prepare statistics object
+        // ── Response ────────────────────────────────────────────────────
         const statistics = {
-            totalStudents: students.length,
-            filterPeriod: startDate && endDate ? {
-                month: month,
-                startDate: startDate,
-                endDate: endDate
-            } : {
-                month: 'all',
-                message: 'Бүх цаг үеийн өгөгдөл'
-            },
+            totalStudents: totalStudentsReg,
+            filterPeriod: startDate && endDate
+                ? { month, startDate, endDate }
+                : { month: 'all', message: 'Бүх цаг үеийн өгөгдөл' },
+
             studentLimit: {
-                totalLimitsBought: allTotalLimitsBought,
-                totalStudentsRegistered: totalStudentsRegistered,
-                remainingLimit: remainingLimit,
-                limitUsagePercentage: limitUsagePercentage,
-                canRegisterMore: remainingLimit > 0
+                totalLimitsBought:       allTotalLimitsBought,
+                totalStudentsRegistered: totalStudentsReg,
+                remainingLimit,
+                limitUsagePercentage:    limitUsagePct,
+                canRegisterMore:         remainingLimit > 0,
             },
+
             revenue: {
-                totalAmount: totalAmount,
-                paidAmount: paidAmount,
-                remainingAmount: remainingAmount,
-                paymentPercentage: paymentPercentage
+                totalAmount,
+                paidAmount,
+                remainingAmount,
+                paymentPercentage,
             },
+
             expenses: {
-                totalExpenses: totalExpenses,
-                systemRentalExpenses: systemRentalExpenses,
-                limitExpenses: limitExpenses,
-                totalLimitsBought: totalLimitsBought,
-                totalSystemRentalCount: systemRentalInvoice.length,
-                activeSystemRentalCount: activeRentals.length,
+                totalExpenses,
+                systemRentalExpenses,
+                limitExpenses,
+                totalLimitsBought,
+                totalSystemRentalCount:   systemRentalInvoice.length,
+                activeSystemRentalCount:  activeRentals.length,
                 expiredSystemRentalCount: expiredRentals.length,
-                limitInvoicesCount: limitBoughtInvoices.length
+                limitInvoicesCount:       limitBoughtInvoices.length,
             },
-            activeSystemRental: latestActiveRental ? {
-                id: latestActiveRental.id,
-                startDate: latestActiveRental.start_date,
-                endDate: latestActiveRental.end_date,
-                amount: parseFloat(latestActiveRental.amount) || 0,
-                number: latestActiveRental.number,
-                daysRemaining: Math.ceil((new Date(latestActiveRental.end_date) - now) / (1000 * 60 * 60 * 24)),
-                isActive: true
-            } : {
-                isActive: false,
-                message: "Идэвхтэй систем байхгүй"
-            },
-            profit: {
-                netProfit: netProfit,
-                profitMargin: profitMargin
-            },
+
+            activeSystemRental: latestActiveRental
+                ? {
+                    id:            latestActiveRental.id,
+                    startDate:     latestActiveRental.start_date,
+                    endDate:       latestActiveRental.end_date,
+                    amount:        parseFloat(latestActiveRental.amount) || 0,
+                    number:        latestActiveRental.number,
+                    daysRemaining: Math.ceil(
+                        (new Date(latestActiveRental.end_date) - now) / (1000 * 60 * 60 * 24)
+                    ),
+                    isActive: true,
+                }
+                : { isActive: false, message: "Идэвхтэй систем байхгүй" },
+
+            profit: { netProfit, profitMargin },
+
             invoices: {
-                total: totalInvoices,
-                paid: paidInvoices,
-                unpaid: unpaidInvoices,
-                cancelled: cancelledInvoices
+                total:     totalInvoices,
+                paid:      paidInvoices,
+                unpaid:    unpaidInvoices,
+                cancelled: cancelledInvoices,
             },
-            lastFiveExams: lastFiveExams,
-            lastThreePaidInvoices: lastThreePaidInvoices,
-            studentsWithDebt: studentsWithDebt
+
+            lastTenExams,
+            lastTenPaidInvoices,
+            studentsWithDebt,
+
+            // ← Салбарын статистик
+            branchStats,
         };
 
         return res.status(200).json({
-            success: true,
-            statistics: statistics,
-            message: "Амжилттай."
+            success:    true,
+            statistics,
+            message:    "Амжилттай."
         });
-
-    } 
-    catch(err) 
+    }
+    catch(err)
     {
         console.error("Statistics calculation error:", err);
         return res.status(500).json({
             success: false,
-            data: [],
+            data:    [],
             message: 'Серверийн алдаа гарлаа: ' + err.message
         });
     }

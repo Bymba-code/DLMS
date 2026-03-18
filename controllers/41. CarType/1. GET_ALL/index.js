@@ -1,34 +1,36 @@
 const { storeData } = require("../../../services/controllerService");
+const prismaService = require("../../../services/prismaService");
 
-const COURSE_GET_ALL_CATEGORY = async (req, res) => {
+const GET_ALL_CAR_TYPE = async (req, res) => {
     try 
     {
-        const course = req.user;
-
         const {
             page,
             limit,
             search,
             orderBy,
             order,
+            phone,
+            city,
+            district,
+            horoo, 
+            featured
         } = req.query;
 
         const where = {};
-        
-        where.course = parseInt(course?.course)
 
         const orderByObj = {
             [orderBy]: order
         };
 
         const searchOptions = search ? {
-            fields: ['list'], 
+            fields: ['name'], 
             value: search
         } : null;
 
-        const include = {category_course_category_categoryTocategory:true};
+        const include = {};
 
-        return await storeData(res, 'course_category', {
+        return await storeData(res, 'car_type', {
             where,
             orderBy: orderByObj,
             page: page ? parseInt(page) : null,
@@ -48,4 +50,4 @@ const COURSE_GET_ALL_CATEGORY = async (req, res) => {
     }
 };
 
-module.exports = COURSE_GET_ALL_CATEGORY ;
+module.exports = GET_ALL_CAR_TYPE ;
