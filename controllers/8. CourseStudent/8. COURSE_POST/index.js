@@ -251,6 +251,8 @@ const COURSE_POST_STUDENT = async (req, res) => {
                 city: parseInt(city),
                 district: parseInt(district),
                 ward:parseInt(ward),
+                active:1,
+                completed:0,
                 location: location,
                 phone: phone,
                 kode: generatedKode, // Автоматаар үүссэн код

@@ -33,7 +33,7 @@ const COURSE_UPDATE_BRANCHES = async (req, res) => {
     const data = await prismaService.branches.findFirst({
       where: {
         id: parseInt(id),
-        course: parseInt(course?.id)
+        course: parseInt(course?.course)
       }
     })
 

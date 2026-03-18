@@ -16,7 +16,7 @@ const OWNER_GET_ALL_COURSE_ACCOUNT = async (req, res) => {
 
         const where = {}
 
-        where.course = parseInt(owner?.id)
+        where.course = parseInt(owner?.course)
 
         const orderByObj = {
             [orderBy]: order

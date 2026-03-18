@@ -1,10 +1,10 @@
 const { storeData } = require("../../../services/controllerService");
 const prismaService = require("../../../services/prismaService");
 
-const COURSE_GET_ALL_BRANCHES = async (req, res) => {
+const COURSE_GET_ALL_SUBSCRIPTION_PLAN = async (req, res) => {
     try 
     {
-        const course = req.user;
+        const user = req.user;
 
         const {
             page,
@@ -12,34 +12,30 @@ const COURSE_GET_ALL_BRANCHES = async (req, res) => {
             search,
             orderBy,
             order,
+            active
         } = req.query;
 
-        const where = {};
+        const where = {}
 
-        where.course = parseInt(course?.course)
+        if(active) where.active === parseInt(active)
+
+        where.course = parseInt(user?.course)
 
         const orderByObj = {
             [orderBy]: order
         };
 
         const searchOptions = search ? {
-            fields: ['kode'], 
+            fields: ['name'], 
             value: search
         } : null;
 
         const include = {
-                course_branches_courseTocourse:true,
-                city_branches_cityTocity:true,
-                district_branches_districtTodistrict:true,
-                wards:true,
-            _count:{
-                select:{
-                    course_student:true
-                }
-            }
+            subscription_plan:true,
+            course_subscription_invoice:true
         };
-            
-        return await storeData(res, 'branches', {
+
+        return await storeData(res, 'course_subscription', {
             where,
             orderBy: orderByObj,
             page: page ? parseInt(page) : null,
@@ -59,4 +55,4 @@ const COURSE_GET_ALL_BRANCHES = async (req, res) => {
     }
 };
 
-module.exports = COURSE_GET_ALL_BRANCHES ;
+module.exports = COURSE_GET_ALL_SUBSCRIPTION_PLAN ;

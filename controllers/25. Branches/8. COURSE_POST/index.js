@@ -76,7 +76,7 @@ const COURSE_POST_BRANCHES = async (req , res) => {
         const existBranch = await prismaService.branches.findFirst({
             where:{
                 name: name,
-                course: parseInt(course?.id)
+                course: parseInt(course?.course)
             }
         })
 
@@ -91,7 +91,7 @@ const COURSE_POST_BRANCHES = async (req , res) => {
 
         const result = await prismaService.branches.create({
             data: {
-                course: parseInt(course?.id),
+                course: parseInt(course?.course),
                 name:name,
                 code: code ? code : "",
                 phone:phone,

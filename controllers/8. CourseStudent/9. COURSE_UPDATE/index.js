@@ -32,7 +32,7 @@ const COURSE_UPDATE_STUDENT = async (req, res) => {
       })
     }
 
-    const { branch, familyname, firstname, lastname, register, gender, bloodtype, city, district, ward, location, phone, birthdate, category, password, confirmPassword} = req.body;
+    const { branch, familyname, firstname, lastname, register, gender, bloodtype, city, district, ward, location, phone, birthdate, category, password, confirmPassword, active, completed, reason} = req.body;
 
     let hashedPassword = "";
     if (password) {
@@ -68,6 +68,9 @@ const COURSE_UPDATE_STUDENT = async (req, res) => {
         ...(city && { city:parseInt(city) }),
         ...(district && { district:parseInt(district) }),
         ...(ward && {ward: parseInt(ward)}),
+        ...(active !== undefined && {active: parseInt(active)}),
+        ...(completed !== undefined && {completed: parseInt(completed)}),
+        ...(reason !== undefined && {reason}),
         ...(location && { location }),
         ...(phone && { phone }),
         ...(birthdate && { birthdate: new Date(birthdate) }),

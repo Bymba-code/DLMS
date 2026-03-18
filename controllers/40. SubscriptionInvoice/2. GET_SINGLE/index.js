@@ -1,10 +1,8 @@
 const { storeSingleData } = require("../../../services/controllerService");
 const prismaService = require("../../../services/prismaService");
 
-const OWNER_GET_SINGLE_COURSE_ACCOUNT = async (req, res) => {
+const COURSE_GET_SINGLE_SUBSCRIPTION_INVOICE = async (req, res) => {
     try {
-        const owner = req.user;
-
         const { id } = req.params;
 
         if (!id || isNaN(id)) {
@@ -15,29 +13,18 @@ const OWNER_GET_SINGLE_COURSE_ACCOUNT = async (req, res) => {
             });
         }
 
-        const data = await prismaService.course_account.findFirst({
-            where:{
-                id:parseInt(id),
-                course:parseInt(owner?.course)
-            }
-        })
-
-        if(!data)
-        {
-            return res.status(404).json({
-                success:false,
-                data:[],
-                message: "Мэдээлэл устсан эсвэл байхгүй байна."
-            })
-        }
-
         const where = { id: parseInt(id) };
+
        
         const include = {
-            bank_course_account_bankTobank:true
+            course_subscription:{
+                include:{
+                    subscription_plan:true
+                }
+            }
         };
 
-        return await storeSingleData(res, 'course_account', {
+        return await storeSingleData(res, 'course_subscription_invoice', {
             where,
             include
         });
@@ -52,4 +39,4 @@ const OWNER_GET_SINGLE_COURSE_ACCOUNT = async (req, res) => {
     }
 };
 
-module.exports = OWNER_GET_SINGLE_COURSE_ACCOUNT;
+module.exports = COURSE_GET_SINGLE_SUBSCRIPTION_INVOICE;
