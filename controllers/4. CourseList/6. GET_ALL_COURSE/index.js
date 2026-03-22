@@ -15,7 +15,7 @@ const COURSE_GET_ALL_LIST = async (req, res) => {
 
         const where = {};
         
-        where.course = parseInt(course?.id)
+        where.course = parseInt(course?.course)
 
         const orderByObj = {
             [orderBy]: order

@@ -17,7 +17,7 @@ const COURSE_POST_LIST = async (req , res) => {
             })
         }
         
-        await insertData(res, { model: 'course_list', data: { course: parseInt(course?.id), list: list}})
+        await insertData(res, { model: 'course_list', data: { course: parseInt(course?.course), list: list}})
     }
     catch(err)
     {

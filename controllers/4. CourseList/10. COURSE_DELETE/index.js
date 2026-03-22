@@ -18,7 +18,7 @@ const COURSE_DELETE_LIST = async (req , res) => {
         const existData = await prismaService.course_list.findFirst({
             where: {
                 id: parseInt(id),
-                course:parseInt(course?.id)
+                course:parseInt(course?.course)
             }
         })
 

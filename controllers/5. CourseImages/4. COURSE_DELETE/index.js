@@ -4,7 +4,7 @@ const prismaService = require("../../../services/prismaService");
 const COURSE_DELETE_IMAGE = async (req , res) => {
     try 
     {
-        const course = req.user;
+        const user = req.user;
 
         const { id } = req.params;
 
@@ -31,7 +31,7 @@ const COURSE_DELETE_IMAGE = async (req , res) => {
             })
         }
 
-        if(parseInt(existData.course) !== parseInt(course.id))
+        if(parseInt(existData.course) !== parseInt(user.course))
         {
             return res.status(400).json({
                 success:false,

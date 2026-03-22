@@ -4,7 +4,7 @@ const prismaService = require("../../../services/prismaService")
 const COURSE_POST_IMAGE = async (req , res) => {
     try 
     {
-        const course = req.user
+        const user = req.user;
 
         if(!req.file)
         {
@@ -19,7 +19,7 @@ const COURSE_POST_IMAGE = async (req , res) => {
 
         const result = await prismaService.course_images.create({
             data:{
-                course: parseInt(course && course.id ? parseInt(course.id) : ""),
+                course: parseInt(user && user.course ? parseInt(user?.course) : ""),
                 image:imageUrl
             }
         })

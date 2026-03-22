@@ -4,34 +4,15 @@ const bcrypt = require("bcrypt")
 const UPDATE_COURSE = async (req , res) => {
     try 
     {
-        const { id } = req.params;
+        const user = req.user;
 
-        if (!id || isNaN(id)) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                message: 'Мэдээлэл буруу эсвэл дутуу байна.'
-            });
-        }
-
-        const {name, kode, password, city, district, horoo, location, phone,shortdesc} = req.body;
-
-
-        let hashed;
-        const salt = await bcrypt.genSalt(10)
-
-        if(password)
-        {
-            hashed = await bcrypt.hash(password, salt)
-        }
+        const {name,city, district, horoo, location, phone,shortdesc} = req.body;
         
         await updateData(res, {
             model:`course`,
-            whereClause: { id: parseInt(id)},
+            whereClause: { id: parseInt(user?.course)},
             data: {
                 ...(name && { name }),
-                ...(kode && { kode }),
-                ...(password && { password:hashed }),
                 ...(city && { city }),
                 ...(district && { district }),
                 ...(horoo && { horoo }),

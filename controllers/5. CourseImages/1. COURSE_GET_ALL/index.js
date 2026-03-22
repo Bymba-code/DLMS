@@ -3,7 +3,7 @@ const { storeData } = require("../../../services/controllerService");
 const COURSE_GET_ALL_IMAGE = async (req, res) => {
     try 
     {
-        const course = req.user;
+        const user = req.user;
 
         const {
             page,
@@ -15,7 +15,7 @@ const COURSE_GET_ALL_IMAGE = async (req, res) => {
 
         const where = {};
 
-        where.course = parseInt(course.id)
+        where.course = parseInt(user.course)
 
         const orderByObj = {
             [orderBy]: order

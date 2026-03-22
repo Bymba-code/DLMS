@@ -73,7 +73,7 @@ const COURSE_POST_USER = async (req , res) => {
             })
         }
 
- if(password !== confirmPassword)
+        if(password !== confirmPassword)
         {
             return res.status(400).json({
                 success:false,

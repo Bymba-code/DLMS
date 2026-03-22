@@ -4,7 +4,7 @@ const prismaService = require("../../../services/prismaService");
 const ME_COURSE = async (req, res) => {
     try 
     {
-        const course = req.user;
+        const user = req.user;
 
         const {
             page,
@@ -15,7 +15,7 @@ const ME_COURSE = async (req, res) => {
         } = req.query;
 
         const where = {};
-        where.id = course?.id
+        where.id = user?.course
 
         const orderByObj = {
             [orderBy]: order

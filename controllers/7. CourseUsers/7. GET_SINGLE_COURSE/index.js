@@ -14,7 +14,6 @@ const COURSE_GET_SINGLE_USER = async (req, res) => {
                 message: 'Мэдээлэл буруу эсвэл дутуу байна.'
             });
         }
-
        
         const existData = await prismaService.course_users.findFirst({
             where: {

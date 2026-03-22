@@ -9,7 +9,7 @@ const OWNER_GET_ALL_CATEGORY = async (req, res) => {
         // Энэ course-д аль хэдийн нэмэгдсэн category-ийн ID-уудыг авна
         const courseCategories = await prismaService.course_category.findMany({
             where: {
-                course: parseInt(owner?.id)
+                course: parseInt(owner?.course)
             },
             select: {
                 category: true
