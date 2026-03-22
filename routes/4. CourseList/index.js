@@ -9,6 +9,7 @@ const COURSE_GET_ALL_LIST = require("../../controllers/4. CourseList/6. GET_ALL_
 const COURSE_GET_SINGLE_LIST = require("../../controllers/4. CourseList/7. GET_SINGLE_COURSE")
 const COURSE_POST_LIST = require("../../controllers/4. CourseList/8. COURSE_POST")
 const COURSE_DELETE_LIST = require("../../controllers/4. CourseList/10. COURSE_DELETE")
+const authMiddlewareUser = require("../../middlewares/userCookieAuth")
 
 const router = express.Router()
 
@@ -22,13 +23,13 @@ router.route("/course-list/:id")
 .delete(DELETE_COURSE_LIST)
 
 router.route("/autoschool/course-list")
-.get(authMiddlewareCourse, COURSE_GET_ALL_LIST)
-.post(authMiddlewareCourse, COURSE_POST_LIST)
+.get(authMiddlewareUser, COURSE_GET_ALL_LIST)
+.post(authMiddlewareUser, COURSE_POST_LIST)
 
 router.route("/autoschool/course-list/:id")
-.get(authMiddlewareCourse, COURSE_GET_SINGLE_LIST)
-.put(authMiddlewareCourse, UPDATE_COURSE_LIST   )
-.delete(authMiddlewareCourse, COURSE_DELETE_LIST)
+.get(authMiddlewareUser, COURSE_GET_SINGLE_LIST)
+.put(authMiddlewareUser, UPDATE_COURSE_LIST   )
+.delete(authMiddlewareUser, COURSE_DELETE_LIST)
 
 
 module.exports = router

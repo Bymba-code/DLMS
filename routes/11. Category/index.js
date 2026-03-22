@@ -8,6 +8,7 @@ const authMiddlewareStudent = require("../../middlewares/studentCookieAuth")
 const STUDENT_GET_ALL_CATEGORY = require("../../controllers/11. Category/6. STUDENT")
 const OWNER_GET_ALL_CATEGORY = require("../../controllers/11. Category/7. COURSE_GET_ALL")
 const authMiddlewareCourse = require("../../middlewares/authMiddlewareCourse")
+const authMiddlewareUser = require("../../middlewares/userCookieAuth")
 
 const router = express.Router()
 
@@ -24,6 +25,6 @@ router.route("/student/category")
 .get(authMiddlewareStudent, STUDENT_GET_ALL_CATEGORY)
 
 router.route("/owner/category")
-.get(authMiddlewareCourse, OWNER_GET_ALL_CATEGORY)
+.get(authMiddlewareUser, OWNER_GET_ALL_CATEGORY)
 
 module.exports = router

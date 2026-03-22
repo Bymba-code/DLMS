@@ -5,15 +5,16 @@ const COURSE_POST_IMAGE = require("../../controllers/5. CourseImages/2. COURSE_P
 const COURSE_UPDATE_IMAGE = require("../../controllers/5. CourseImages/3. COURSE_UPDATE")
 const COURSE_DELETE_IMAGE = require("../../controllers/5. CourseImages/4. COURSE_DELETE")
 const { upload } = require("../../services/uploadService")
+const authMiddlewareUser = require("../../middlewares/userCookieAuth")
 
 const router = express.Router()
 
 router.route("/course-images")
-.get(authMiddlewareCourse, COURSE_GET_ALL_IMAGE)
-.post(authMiddlewareCourse, upload.single(`file`), COURSE_POST_IMAGE)
+.get(authMiddlewareUser, COURSE_GET_ALL_IMAGE)
+.post(authMiddlewareUser, upload.single(`file`), COURSE_POST_IMAGE)
 
 router.route("/course-images/:id")
-.put(authMiddlewareCourse, upload.single(`file`), COURSE_UPDATE_IMAGE)
-.delete(authMiddlewareCourse, COURSE_DELETE_IMAGE)
+.put(authMiddlewareUser, upload.single(`file`), COURSE_UPDATE_IMAGE)
+.delete(authMiddlewareUser, COURSE_DELETE_IMAGE)
 
 module.exports = router

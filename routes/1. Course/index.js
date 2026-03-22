@@ -16,17 +16,18 @@ const router = express.Router()
 router.route("/course")
 .get(GET_ALL_COURSE)
 .post(POST_COURSE)
+.put(authMiddlewareUser, UPDATE_COURSE)
+
 
 router.route("/course/:id")
 .get(GET_SINGLE_COURSE)
-.put(UPDATE_COURSE)
 .delete(DELETE_COURSE)
 
 router.route("/auth/login/course")
 .post(LOGIN_COURSE)
 
 router.route("/me/course")
-.get(authMiddlewareCourse, ME_COURSE)
+.get(authMiddlewareUser, ME_COURSE)
 
 router.route("/stat/course")
 .get(authMiddlewareUser, STAT_COURSE)
