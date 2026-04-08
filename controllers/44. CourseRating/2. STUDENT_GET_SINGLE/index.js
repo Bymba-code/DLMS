@@ -1,9 +1,9 @@
 const { storeSingleData } = require("../../../services/controllerService");
 const prismaService = require("../../../services/prismaService");
 
-const COURSE_GET_SINGLE_GROUP = async (req, res) => {
+const STUDENT_GET_SINGLE_COURSE_RATING = async (req, res) => {
     try {
-        const user = req.user;
+        const student = req.user;
 
         const { id } = req.params;
 
@@ -15,10 +15,10 @@ const COURSE_GET_SINGLE_GROUP = async (req, res) => {
             });
         }
 
-        const data = await prismaService.course_group.findFirst({
+        const data = await prismaService.course_rating.findFirst({
             where:{
-                id:parseInt(id),
-                course:parseInt(user?.course)
+                student:parseInt(student?.id),
+                course: parseInt(student?.course)
             }
         })
 
@@ -35,7 +35,7 @@ const COURSE_GET_SINGLE_GROUP = async (req, res) => {
        
         const include = {};
 
-        return await storeSingleData(res, 'course_group', {
+        return await storeSingleData(res, 'course_rating', {
             where,
             include
         });
@@ -50,4 +50,4 @@ const COURSE_GET_SINGLE_GROUP = async (req, res) => {
     }
 };
 
-module.exports = COURSE_GET_SINGLE_GROUP;
+module.exports = STUDENT_GET_SINGLE_COURSE_RATING;

@@ -1,53 +1,41 @@
 const { storeData } = require("../../../services/controllerService");
 const prismaService = require("../../../services/prismaService");
 
-const COURSE_GET_ALL_GROUP = async (req, res) => {
+const STUDENT_GET_ALL_COURSE_RATING = async (req, res) => {
     try 
     {
-        const user = req.user;
+        const student = req.user;
 
         const {
             page,
             limit,
             search,
             orderBy,
-            order
+            order,
+            phone,
+            city,
+            district,
+            horoo, 
+            featured
         } = req.query;
 
         const where = {};
 
-        where.course = parseInt(user?.course)
+        where.student = parseInt(student?.id)
+        where.course = parseInt(student?.course)
 
         const orderByObj = {
             [orderBy]: order
         };
-
-        const data = await prismaService.course_group.findFirst({
-            include:{
-                course_category:true,
-                course_group_to_student_course_group_to_student_course_groupTocourse_group:{
-                    include:{
-                        course_student:true
-                    }
-                }
-            }
-        })
 
         const searchOptions = search ? {
             fields: ['name'], 
             value: search
         } : null;
 
-        const include = {
-            course_category:true,
-                course_group_to_student_course_group_to_student_course_groupTocourse_group:{
-                    include:{
-                        course_student:true
-                    }
-                }
-        };
+        const include = {};
 
-        return await storeData(res, 'course_group', {
+        return await storeData(res, 'course_rating', {
             where,
             orderBy: orderByObj,
             page: page ? parseInt(page) : null,
@@ -67,4 +55,4 @@ const COURSE_GET_ALL_GROUP = async (req, res) => {
     }
 };
 
-module.exports = COURSE_GET_ALL_GROUP ;
+module.exports = STUDENT_GET_ALL_COURSE_RATING ;
