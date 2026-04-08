@@ -60,40 +60,6 @@ const COURSE_POST_STUDENT = async (req, res) => {
     try 
     {
         const user = req.user;
-
-        const paidInvoices = await prismaService.course_limit_invoice.findMany({
-            where: {
-                course: parseInt(user?.course),
-                status: "paid"
-            }
-        });
-
-
-        if(!paidInvoices)
-        {
-            return res.status(404).json({
-                success:false,
-                data:[],
-                message: "Танд худалдаж авсан бүртгэлийн тоо байхгүй байна."
-            })
-        }
-
-        const totalLimit = paidInvoices.reduce((sum, item) => sum + item.limit, 0);
-
-        const totalStudent = await prismaService.course_student.count({
-            where: {
-                course: parseInt(user?.course)
-            }
-        });
-
-        if(parseInt(totalStudent) >= parseInt(totalLimit))
-        {
-            return res.status(400).json({
-                success: false,
-                data: [],
-                message: "Бүртгэлийн хязгаар дүүрсэн байна."
-            });
-        }
         
         const { branch, familyname, firstname, lastname, register, gender, bloodtype, city, district, ward, location, phone, birthdate, category } = req.body;
 
