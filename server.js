@@ -44,6 +44,8 @@ const subscriptionPlanRoute = require("./routes/38. SubscriptionPlans")
 const CourseSubscriptionPlanRoute = require("./routes/39. Subscription")
 const courseSubscriptionPlanInvoiceRoute = require("./routes/40. SubscriptionInvoice")
 const carTypeRoute = require("./routes/41. CarType")
+const courseGroupRoute = require("./routes/42. CourseGroup")
+const courseGroupStudentRoute = require("./routes/43. CourseGroupStudent")
 
 const app = express()
 
@@ -96,6 +98,8 @@ app.use(process.env.API_VERSION, subscriptionPlanRoute)
 app.use(process.env.API_VERSION, CourseSubscriptionPlanRoute)
 app.use(process.env.API_VERSION, courseSubscriptionPlanInvoiceRoute)
 app.use(process.env.API_VERSION, carTypeRoute)
+app.use(process.env.API_VERSION, courseGroupRoute)
+app.use(process.env.API_VERSION, courseGroupStudentRoute)
 
 app.use('/uploads', express.static('uploads'));
 
