@@ -17,6 +17,8 @@ const STUDENT_GET_STAT = require("../../controllers/8. CourseStudent/13. STAT")
 const COURSE_STUDENT_REPORT = require("../../controllers/8. CourseStudent/14. SystemReport")
 const LOGOUT_STUDENT = require("../../controllers/8. CourseStudent/15. LOGOUT")
 const checkSubscription = require("../../middlewares/subscriptionPlan")
+const ME_STUDENT_TEN_EXAM_AVERATE = require("../../controllers/8. CourseStudent/16. TEN_EXAM_AVERAGE")
+const ME_STUDENT_STATUS = require("../../controllers/8. CourseStudent/17. ME_DEDU")
 
 const router = express.Router()
 
@@ -52,5 +54,11 @@ router.route("/autoschool/report-student")
 
 router.route("/logout/student")
 .post(authMiddlewareStudent, LOGOUT_STUDENT)
+
+router.route("/me/student/ten-exam-average")
+.get(authMiddlewareStudent, ME_STUDENT_TEN_EXAM_AVERATE)
+
+router.route("/me/student/status")
+.get(authMiddlewareStudent, ME_STUDENT_STATUS)
 
 module.exports = router
