@@ -51,6 +51,7 @@ const LOGIN_STUDENT = async (req, res) => {
         id: student.id,
         kode: student.kode,
         course: student.course,
+        branch:student?.branch
       },
       process.env.TOKEN_SECRET || "your-secret-key-change-this-in-production",
       {

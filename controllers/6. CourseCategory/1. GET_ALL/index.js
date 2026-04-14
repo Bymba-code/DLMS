@@ -10,9 +10,12 @@ const GET_ALL_COURSE_CATEGORY = async (req, res) => {
             search,
             orderBy,
             order,
+            course
         } = req.query;
 
         const where = {};
+
+        if(course) where.course = parseInt(course)
 
         const orderByObj = {
             [orderBy]: order

@@ -9,6 +9,12 @@ const ME_STUDENT = async (req, res) => {
         const data = await prismaService.course_student.findUnique({
             where: {
                 id: parseInt(student?.id)
+            },
+            include:{
+                course_course_student_courseTocourse:true,
+                city_course_student_cityTocity:true,
+                district_course_student_districtTodistrict:true,
+                wards:true
             }
         })
 
@@ -17,7 +23,6 @@ const ME_STUDENT = async (req, res) => {
                 student:parseInt(student?.id)
             }
         })
-        
 
         if(!data)
         {
@@ -27,7 +32,7 @@ const ME_STUDENT = async (req, res) => {
                 message: "Мэдээлэл устсан эсвэл байхгүй байна."
             })
         }
-        
+
         const messageCount = await prismaService.messages.count({
             where: {
                 isRead:0,
@@ -35,12 +40,46 @@ const ME_STUDENT = async (req, res) => {
             }
         })
 
+        const userRating = await prismaService.course_rating.findFirst({
+            where:{
+                student:parseInt(student?.id),
+                course:parseInt(student?.course)
+            }
+        })
+
+        // Төлбөр шалгах
+        const now = new Date();
+        const activePayment = await prismaService.course_student_payment.findFirst({
+            where: {
+                student: parseInt(student?.id),
+                status: "Төлөгдсөн",
+                end_date: {
+                    gte: now
+                }
+            },
+            orderBy: {
+                end_date: "desc"
+            }
+        })
+
+        // 14 хоног өнгөрсөн эсэхийг шалгах
+        const registeredDate = new Date(data.date);
+        const diffInDays = Math.floor((now - registeredDate) / (1000 * 60 * 60 * 24));
+        const isOver14Days = diffInDays >= 14;
+
+        // 14 хоног болж, rating өгөөгүй бол заавал өгүүлэх
+        const ratingRequired = isOver14Days && !userRating;
+
         return res.status(200).json({
             success:true,
-            data:{data,
-            messageCount,
-            detail: studentDetail ? true : false
-        },
+            data:{
+                data,
+                messageCount,
+                detail: studentDetail ? true : false,
+                userRating: userRating ? true : false,
+                ratingRequired,
+                payment: activePayment ? true : false
+            },
             message:"Амжилттай."
         })
 
@@ -55,4 +94,4 @@ const ME_STUDENT = async (req, res) => {
     }
 };
 
-module.exports = ME_STUDENT ;
+module.exports = ME_STUDENT;

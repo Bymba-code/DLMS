@@ -5,6 +5,7 @@ const STUDENT_GET_STAT = async (req, res) => {
     try 
     {
         const student = req.user;
+        console.log(student)
 
         const studentData = await prismaService.course_student_category.findFirst({
             where: {
@@ -50,7 +51,7 @@ const STUDENT_GET_STAT = async (req, res) => {
             }
         });
 
-        console.log(topics)
+       
 
         // Оюутны сэдвүүдийн явцыг авах
         const studentTopicProgress = await prismaService.student_topic_progress.findMany({
@@ -267,10 +268,23 @@ const STUDENT_GET_STAT = async (req, res) => {
             status: exam.isMake === 1 ? 'Дууссан' : 'Дуусаагүй'
         }));
 
+        const course = await prismaService.course.findUnique({
+            where:{
+                id:parseInt(student?.course)
+            }
+        })
+        const branch = await prismaService.branches.findUnique({
+            where:{
+                id:parseInt(student?.branch)
+            }
+        })
+
         // Response буцаах
         return res.status(200).json({
             success: true,
             data: {
+                course,
+                branch,
                 // Танхимийн хуваарийн статистик
                 scheduleStats: {
                     total: scheduleStats.total,
