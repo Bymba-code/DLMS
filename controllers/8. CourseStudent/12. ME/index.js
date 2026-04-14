@@ -6,6 +6,14 @@ const ME_STUDENT = async (req, res) => {
     {
         const student = req.user;
 
+        const course = await prismaService.course.findUnique({
+            where:{
+                id:parseInt(student?.course)
+            }
+        })
+
+        console.log(course)
+
         const data = await prismaService.course_student.findUnique({
             where: {
                 id: parseInt(student?.id)
@@ -70,6 +78,9 @@ const ME_STUDENT = async (req, res) => {
         // 14 хоног болж, rating өгөөгүй бол заавал өгүүлэх
         const ratingRequired = isOver14Days && !userRating;
 
+        const isFree = course?.isStudentPayment === 0;
+const hasPayment = !!activePayment;
+
         return res.status(200).json({
             success:true,
             data:{
@@ -78,7 +89,7 @@ const ME_STUDENT = async (req, res) => {
                 detail: studentDetail ? true : false,
                 userRating: userRating ? true : false,
                 ratingRequired,
-                payment: activePayment ? true : false
+                payment: isFree || hasPayment
             },
             message:"Амжилттай."
         })
