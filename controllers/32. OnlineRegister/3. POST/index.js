@@ -2,9 +2,9 @@ const { insertData } = require("../../../services/controllerService")
 const bcrypt = require("bcrypt")
 const prismaService = require("../../../services/prismaService") 
 
-const generateStudentCode = async () => {
+const generateStudentCode = async (courseId) => {
     try {
-        const lastCourse = await prismaService.course.findFirst({
+        const lastStudent = await prismaService.course_student.findFirst({
             orderBy: {
                 id: 'desc'
             },
@@ -14,23 +14,24 @@ const generateStudentCode = async () => {
         });
 
         const basePrefix = "DL";
-        const suffix = "D";
+        const suffix = "S";
         
-        if (!lastCourse || !lastCourse.kode) {
+        if (!lastStudent || !lastStudent.kode) {
             return `${basePrefix}01${suffix}001`;
         }
 
-        const lastCode = lastCourse.kode;
-       
+        const lastCode = lastStudent.kode;
+        
         const regex = /^DL(\d{2})S(\d{3})$/;
         const match = lastCode.match(regex);
         
         if (match) {
-            let groupNumber = parseInt(match[1]); // DL-ийн дараах 2 оронтой дугаар (01, 02, ...)
-            let sequenceNumber = parseInt(match[2]); // S-ийн дараах 3 оронтой дугаар (001, 002, ...)
+            let groupNumber = parseInt(match[1]); 
+            let sequenceNumber = parseInt(match[2]); 
             
             sequenceNumber += 1;
             
+      
             if (sequenceNumber > 999) {
                 groupNumber += 1;
                 sequenceNumber = 1;
@@ -192,57 +193,54 @@ const POST_ONLINE_REGISTER = async (req , res) => {
             })
         }
 
-        const responseByl = await axios.post(`https://byl.mn/api/v1/projects/${process.env.PROJECT_ID}/invoices`,
-            {
-                amount: parseInt(courseCategory?.registerPrice),
-                description: `${ course } АВТОСУРГУУЛИЙН, БҮРТГЭЛИЙН ТӨЛБӨР`,
-                auto_advance:true
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.BYL_TOKEN}`
-                }
-            }
-        )
+        const generatedKode = await generateStudentCode(course);
+        
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(generatedKode, salt);
 
-        const result = await prismaService.course_online_register.create({
-            data:{
-                course: parseInt(course),
+        const result = await prismaService.course_student.create({
+            data: {
                 branch: parseInt(branch),
-                invoice_id: parseInt(responseByl.data.data.invoice_id),
-                status: responseByl?.data?.data?.status,
-                amount: responseByl?.data?.data?.amount,
-                description: responseByl?.data?.data.description,
-                number: responseByl?.data?.data?.number,
-                url: responseByl?.data?.data?.url,
-                due_date:responseByl?.data?.data?.due_date,
-                created_at: responseByl?.data?.data?.created_at,
-                updated_at: responseByl?.data?.data?.updated_at,
-                familyname:familyname,
-                firstname:firstname,
-                lastname:lastname,
-                register:register,
-                gender:parseInt(gender),
-                bloodtype:parseInt(bloodtype),
-                city:parseInt(city),
-                district:parseInt(district),
+                course: parseInt(course),
+                familyname: familyname,
+                firstname: firstname,
+                lastname: lastname,
+                register: register,
+                gender: parseInt(gender),
+                bloodtype: parseInt(bloodtype),
+                city: parseInt(city),
+                district: parseInt(district),
                 ward:parseInt(ward),
+                active:1,
+                completed:0,
                 location: location,
-                phone:phone,
-                birthdate:new Date(birthdate),
+                phone: phone,
+                kode: generatedKode, 
+                password: hash, 
+                birthdate: new Date(birthdate),
                 date: new Date()
             }
-        })
+        });
+
+        const resultCategory = await prismaService.course_student_category.create({
+            data: {
+                student: parseInt(result?.id),
+                category: parseInt(category),
+                payment: parseInt(courseCategory.price),
+                date: new Date()
+            }
+        });
 
         return res.status(200).json({
             success:true,
-            data:[],
+            data:result,
             message: "Амжилттай."
         })
 
     }
     catch(err)
     {
+        console.log(err)
         return res.status(500).json({
             success:false,
             data:[],

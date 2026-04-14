@@ -10,9 +10,12 @@ const GET_ALL_BRANCHES = async (req, res) => {
             search,
             orderBy,
             order,
+            course
         } = req.query;
 
         const where = {};
+
+        where.course = parseInt(course)
 
         const orderByObj = {
             [orderBy]: order
