@@ -334,6 +334,7 @@ const STAT_COURSE = async (req, res) => {
         const limitUsagePct     = allTotalLimitsBought > 0
             ? Math.round((totalStudentsReg / allTotalLimitsBought) * 100) : 0;
 
+
         // ── Response ────────────────────────────────────────────────────
         const statistics = {
             totalStudents: totalStudentsReg,
